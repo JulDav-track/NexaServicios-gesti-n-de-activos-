@@ -1,3 +1,5 @@
+Encuesta
+
 | Fecha | Área | Problema Inventario | Problema Seguimiento | Acuerdo Sistema Actual | Dificultad Localizar Equipos | Dificultad Solicitudes | Funcionalidad Deseada | Método Actual | Información Importante | ¿Firma Acta? | Dato Más Relevante | Problema Principal | Sugerencia de Mejora | Acción Automática Deseada |
 |---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|---------|
 | 23/04/2026 17:43 | Área de TI | Poco | Mucho | Totalmente en desacuerdo | Poco | Poco | Alertas preventivas antes de fallas | Pregunto de forma verbal | Reportar mantenimiento fácil | A veces | Fecha de entrega | X | X | Acta digital firmada por ambos |
