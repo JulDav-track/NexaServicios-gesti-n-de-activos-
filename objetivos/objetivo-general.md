@@ -1,0 +1,6 @@
+Objetivo General
+
+Realizar el análisis de documentos existentes en Nexa Servicios para identificar, clasificar y documentar de manera sistemática los problemas reales en la gestión de activos fijos (inventario, asignación, mantenimiento y bajas).
+Esta revisión abarca correos electrónicos con solicitudes y respuestas, mensajes y capturas de WhatsApp, archivos Excel con nombres versionados manualmente como “Solicitud_importante_final_final_v9_ahorasixl” y cualquier otro registro informal que circula en la empresa.
+El propósito radica en que estos documentos son la única evidencia tangible de los procesos actuales y revelan el desorden digital generado por canales fragmentados, ausencia de identificadores únicos, aprobaciones informales sin respaldo formal y pérdida constante de versiones e historiales.
+De esta forma se obtiene una base objetiva y detallada de requisitos que pone en evidencia la falta total de trazabilidad y los riesgos operativos y fiscales asociados, sirviendo como fundamento sólido para las fases posteriores del desarrollo del sistema de información.
