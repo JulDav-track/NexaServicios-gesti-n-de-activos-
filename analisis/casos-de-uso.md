@@ -1,38 +1,20 @@
 Casos de Usos
 
-| ID | HU Relacionada | Descripción |
-|----|----------------|-------------|
-| RF 01 | HU 21 | El sistema debe permitir buscar y consultar la información detallada e histórica de cualquier activo registrado, incluyendo asignaciones, devoluciones, reparaciones y cambios de responsable. |
-| RF 02 | HU 01 | El sistema debe registrar todos los activos de la empresa (laptops, celulares, herramientas) con código único, tipo, marca, modelo, ubicación y estado actual. |
-| RF 03 | HU 02 | El sistema debe mostrar al responsable actual de cada activo (nombre completo y fecha de asignación). |
-| RF 04 | HU 09 | El sistema debe actualizar automáticamente el responsable cuando un equipo cambia de persona. |
-| RF 05 | HU 03 | El sistema debe generar automáticamente un acta digital de entrega al asignar un equipo. |
-| RF 06 | HU 11 | El sistema debe incluir en el acta los datos del equipo, datos del empleado y fecha de entrega. |
-| RF 07 | HU 04 | El sistema debe enviar notificaciones al responsable de Activos cuando un equipo se acerque a su fecha de devolución. |
-| RF 08 | HU 04 | El sistema debe enviar notificaciones al responsable de Activos cuando un equipo haya superado su fecha de devolución. |
-| RF 09 | HU 05 | El sistema debe generar reportes de equipos asignados y disponibles. |
-| RF 10 | HU 17 | El sistema debe permitir filtrar los reportes por estado del equipo y por responsable. |
-| RF 11 | HU 06 | El sistema debe permitir a los empleados registrar una nueva solicitud de equipo indicando el tipo de activo y el motivo. |
-| RF 12 | HU 06 | El sistema debe asignar un número de seguimiento único a cada solicitud registrada. |
-| RF 13 | HU 07 | El sistema debe mostrar al empleado la lista de todos los equipos que tiene asignados actualmente. |
-| RF 14 | HU 07 | El sistema debe mostrar la fecha de entrega y el estado actual de cada equipo asignado al empleado. |
-| RF 15 | HU 08 | El sistema debe permitir al empleado registrar la devolución de un equipo. |
-| RF 16 | HU 09 | El sistema debe actualizar automáticamente el estado del equipo a "Disponible" al registrar la devolución. |
-| RF 17 | HU 08 | El sistema debe permitir al responsable de Activos confirmar la recepción de un equipo devuelto. |
-| RF 18 | HU 09 | El sistema debe registrar la validación del estado y actualizar la responsabilidad en el sistema. |
-| RF 19 | HU 13 | El sistema debe enviar una notificación por correo al empleado cuando el equipo solicitado cambie a estado "Listo para recoger", incluyendo la información del equipo y la ubicación de entrega. |
-| RF 20 | HU 10 | El sistema debe registrar el incidente y enviar la notificación correspondiente al área de TI. |
-| RF 21 | HU 11 | El sistema debe permitir al empleado firmar digitalmente el documento de entrega al momento de recibir un equipo, registrando la firma junto con la fecha y hora. |
-| RF 22 | HU 13 | El sistema debe enviar una notificación por correo al empleado cuando el equipo solicitado esté listo para recoger, incluyendo la información del equipo y la ubicación de entrega. |
-| RF 23 | HU 12 | El sistema debe permitir a los empleados reportar un equipo dañado o que necesita revisión. |
-| RF 24 | HU 14 | El sistema debe permitir al aprobador visualizar en un solo lugar todas las solicitudes de equipos pendientes de revisión. |
-| RF 25 | HU 10 | El sistema debe incluir en la notificación los datos del equipo y la descripción del equipo reportado. |
-| RF 26 | HU 16 | El sistema debe registrar el historial de reparaciones y mantenimiento por equipo. |
-| RF 27 | HU 16 | El sistema debe mostrar el historial completo de reparaciones al consultar un equipo. |
-| RF 28 | HU 05 | El sistema debe enviar reportes en formato PDF al Técnico de Soporte cuando se reporte un equipo dañado. |
-| RF 29 | HU 18 | El sistema debe registrar todas las acciones realizadas sobre los activos (asignaciones, devoluciones, cambios de responsable y bajas) con fecha, hora y usuario. |
-| RF 30 | HU 18 | El sistema debe guardar en cada registro la fecha, hora y el usuario que realizó la acción. |
-| RF 31 | HU 19 | El sistema debe permitir al usuario iniciar sesión mediante credenciales y adquirir acceso correspondiente a su rol. |
-| RF 32 | HU 20 | El sistema debe permitir al responsable de activos registrar bajas de equipos, indicando el motivo (pérdida, daño irreparable o fin de vida útil). |
-| RF 33 | HU 21 | El sistema debe permitir al responsable de Activos consultar el historial completo de cada equipo. |
-| RF 34 | HU 15 | El sistema debe enviar notificaciones al técnico de soporte cuando se reporte un equipo dañado o necesite revisión. |
+| ID Actor | Nombre del Actor | Tipo | Descripción | Responsabilidades | Permisos / Rol | CU Relacionados | HU Relacionadas | Restricciones |
+|-----------|------------------|------|-------------|-------------------|----------------|-----------------|-----------------|---------------|
+| ACT-01 | Responsable de Activos | Primario | Persona del Área de Talento Humano responsable del control total del inventario de activos de la empresa. | Control total del inventario, asignaciones, devoluciones, bajas, reportes, seguimiento y auditoría de los activos. | Administrador (Alto) | CU-01, CU-02, CU-03, CU-04, CU-05, CU-09, CU-15, CU-18, CU-20, CU-21 | HU-01, HU-02, HU-03, HU-04, HU-05, HU-09, HU-18, HU-19, HU-20, HU-21 | Único rol autorizado para registrar bajas de activos y realizar modificaciones críticas en el inventario. |
+| ACT-02 | Empleado | Primario | Colaborador de la empresa que utiliza los activos para su labor diaria. | Solicitar equipos, consultar asignaciones, reportar daños, registrar devoluciones y firmar actas. | Usuario Final (Medio) | CU-06, CU-07, CU-08, CU-10, CU-11, CU-12, CU-13 | HU-06, HU-07, HU-08, HU-10, HU-11, HU-12, HU-13, HU-19 | Solo puede visualizar y gestionar sus propios activos asignados. Máximo 3 equipos simultáneos. |
+| ACT-03 | Aprobador | Primario | Persona con autoridad para revisar solicitudes de equipos. | Revisar, aprobar o rechazar solicitudes de asignación de equipos. | Aprobador (Medio - Alto) | CU-14, CU-19 | HU-14, HU-19 | No puede realizar asignaciones directas ni modificaciones en el inventario. |
+| ACT-04 | Técnico de Soporte | Primario | Personal del Área de TI responsable del soporte técnico y mantenimiento de equipos. | Recibir reportes de daños, revisar historial de reparaciones y realizar mantenimiento. | Soporte Técnico (Medio) | CU-15, CU-16, CU-19 | HU-15, HU-16, HU-19 | Solo puede modificar información relacionada con reportes de daño y mantenimientos. |
+| ACT-05 | Gerente | Primario | Personal de Gerencia que requiere visibilidad general del estado de los activos. | Consultar reportes consolidados y conocer el estado general de los activos. | Consulta (Alto) | CU-05, CU-17, CU-19 | HU-17, HU-19 | Acceso exclusivamente de consulta. No puede realizar modificaciones. |
+
+
+Tabla Resumen de Actores
+
+| ID | Nombre del Actor | Tipo | Permisos / Rol | CU Relacionados |
+|----|------------------|------|----------------|-----------------|
+| ACT-01 | Responsable de Activos | Primario | Administrador (Alto) | CU-01, CU-02, CU-03, CU-04, CU-05, CU-09, CU-15, CU-18, CU-20, CU-21 |
+| ACT-02 | Empleado | Primario | Usuario Final (Medio) | CU-06, CU-07, CU-08, CU-10, CU-11, CU-12, CU-13 |
+| ACT-03 | Aprobador | Primario | Aprobador (Medio - Alto) | CU-14, CU-19 |
+| ACT-04 | Técnico de Soporte | Primario | Soporte Técnico (Medio) | CU-15, CU-16, CU-19 |
+| ACT-05 | Gerente | Primario | Consulta (Alto) | CU-05, CU-17, CU-19 |
