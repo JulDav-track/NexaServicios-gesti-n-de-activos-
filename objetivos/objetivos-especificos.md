@@ -10,3 +10,7 @@ Diseñar el modelo de datos, la arquitectura del sistema y los flujos de trabajo
 
 Objetivo Específico 3  
 Construir el sistema de gestión de activos mediante la implementación de las funcionalidades definidas en las historias de usuario y requisitos funcionales, garantizando la correcta integración de roles, notificaciones y registros de auditoría. 
+
+
+Objetivo Específico 4
+Validar el sistema de gestión de activos mediante pruebas funcionales y de usuario, asegurando el cumplimiento de los requisitos definidos y la satisfacción de las necesidades identificadas en Nexa Servicios.
