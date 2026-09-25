@@ -222,8 +222,6 @@
 | Responsable             | Usuario o técnico que realizó la acción       | INT                               |      11      |        Sí       | FK hacia Usuario        |
 | Costo                  | Valor asociado al mantenimiento               | INT                               |      10      |        No       | Opcional                |
 | Evidencia              | Documento o archivo de soporte                | VARCHAR (con la ruta del archivo) |       -      |        No       | Ej: foto, informe técnico |
-
-
-
-
 | **Evidencia**           | Documento o archivo de soporte                    | VARCHAR (con la ruta del archivo) |            - |        No       | Ej: foto, informe técnico |
+
+---
