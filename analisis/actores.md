@@ -10,7 +10,7 @@ Actores del Sistema
 
 
 
-Plantilla Base — Descripción de Actor
+Plantilla Base — Descripción de Actor.
 
 | ID Actor | Nombre del Actor | Tipo | Descripción | Responsabilidades | Permisos / Rol | CU Relacionados | HU Relacionadas | Restricciones |
 |-----------|------------------|------|-------------|-------------------|----------------|-----------------|-----------------|---------------|
