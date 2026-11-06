@@ -55,6 +55,7 @@
  * 1.9     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-54: actualizar() solo corrige entre Disponible y Dañado (RN-A16b)
  * 1.10    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-55: actualizar() rechaza un activo en Baja (RN-A18)
  * 1.11    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-60: actualizar() rechaza el cambio de estado con asignación vigente (RN-A16a)
+ * 1.12    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-05: darDeBaja() con UPDATE del Estado a Baja
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
@@ -95,6 +96,7 @@ public class ActivoServicio {
     public static final String M_24 = "El estado no es válido.";
     public static final String M_26 = "Un activo asignado no puede cambiar de estado hasta cerrar su asignación.";
     public static final String M_27 = "Un activo en baja no se puede editar.";
+    public static final String M_28 = "Activo dado de baja correctamente.";
 
     private final Activo modeloActivo = new Activo();
     private final CategoriaServicio categoriaServicio;
@@ -220,5 +222,17 @@ public class ActivoServicio {
             if (actual.getEstado() == Estado_Activo.Asignado) throw new IllegalArgumentException(M_26);
         }
         modeloActivo.actualizar(a);
+    }
+
+    /**
+     * darDeBaja(idActivo : int) · HU-04 · CU-04 (no documentado). Baja lógica:
+     * Activo.darDeBaja() hace UPDATE del Estado a 'Baja', jamás DELETE.
+     */
+    public void darDeBaja(int idActivo) {
+        // Activo inexistente · sin RN; RF-05 (HU-04 CA-5)
+        Activo actual = modeloActivo.buscarPorId(idActivo);
+        if (actual == null) throw new IllegalArgumentException(M_21);
+        // Estado = Baja, conserva los demás datos · RF-05 (RN-A16b: Baja solo al darse de baja)
+        modeloActivo.darDeBaja(idActivo);
     }
 }

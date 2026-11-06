@@ -17,6 +17,7 @@
   Estado  : corte vertical. Propuesta del equipo, pendiente de validar.
   Versión 1.0 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
   Versión 1.1 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-04: formulario de actualización y mensajes
+  Versión 1.2 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-05: botón «Dar de baja» (navega a MK-11)
   =====================================================================
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
@@ -57,6 +58,7 @@
       </select></p>
     <p><button type="submit">Guardar cambios</button>
        <a th:href="@{/activos}">Cancelar (navega a MK-01)</a>
+       <a th:href="@{/activos/{id}/baja(id=${activo.idActivo},placa=${activo.placaInventario},estado=${activo.estado},marca=${activo.marca},modelo=${activo.modelo})}">Dar de baja (navega a MK-11)</a>
     </p>
   </form>
   <p th:unless="${activo}"><a th:href="@{/activos}">Volver a MK-01</a></p>

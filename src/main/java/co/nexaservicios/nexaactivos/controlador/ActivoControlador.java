@@ -19,6 +19,8 @@
  *           listarInventario() GET  / y /activos             -> MK-01
  *           actualizar(id)     GET  /activos/{id}/editar     -> MK-10 (precarga con buscarPorId)
  *           actualizar(id, …)  POST /activos/{id}/editar     -> MK-10
+ *           darDeBaja(id, …)   GET  /activos/{id}/baja       -> MK-11 (datos recibidos de MK-01 o MK-10)
+ *           darDeBaja(id)      POST /activos/{id}/baja       -> MK-11
  * HU      : HU-01, HU-02, HU-03, HU-04
  * RF      : HU-01: RF-01, RF-02, RF-52; HU-02: RF-03, RF-56; HU-03: RF-04, RF-51, RF-53, RF-54, RF-55, RF-60; HU-04: RF-05, RF-57, RF-58, RF-59, RF-164
  * CU      : CU-01 (Tabla 8 de 3.7, mensajes 2 y respuesta); CU-02 a CU-04 (no documentados)
@@ -34,6 +36,7 @@
  * 1.2     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-03: búsquedas por clave hacia MK-01
  * 1.3     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-56: listarInventario() hacia MK-01
  * 1.4     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-04: actualizar() hacia MK-10
+ * 1.5     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-05: darDeBaja() hacia MK-11
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.controlador;
@@ -187,5 +190,38 @@ public class ActivoControlador {
         vista.addAttribute("activo", a);
         vista.addAttribute("estados", Estado_Activo.values());
         return "mk10";
+    }
+
+    /**
+     * MK-11 (aviso modal sobre MK-01 o MK-10). Muestra los datos recibidos de la
+     * pantalla anterior, sin consultar el Servicio (mockups 2.5, Tabla 23).
+     */
+    @GetMapping("/activos/{idActivo}/baja")
+    public String darDeBaja(@PathVariable int idActivo,
+                            @RequestParam(defaultValue = "") String placa,
+                            @RequestParam(defaultValue = "") String estado,
+                            @RequestParam(defaultValue = "") String marca,
+                            @RequestParam(defaultValue = "") String modelo,
+                            Model vista) {
+        vista.addAttribute("idActivo", idActivo);
+        vista.addAttribute("placa", placa);
+        vista.addAttribute("estado", estado);
+        vista.addAttribute("marca", marca);
+        vista.addAttribute("modelo", modelo);
+        return "mk11";
+    }
+
+    /** darDeBaja(idActivo) · HU-04 (MK-11, «Confirmar baja»). */
+    @PostMapping("/activos/{idActivo}/baja")
+    public String darDeBaja(@PathVariable int idActivo, Model vista) {
+        try {
+            activoServicio.darDeBaja(idActivo);
+            vista.addAttribute("mensajeExito", ActivoServicio.M_28);
+        } catch (IllegalArgumentException | SecurityException e) {
+            vista.addAttribute("mensajeError", e.getMessage());
+        }
+        vista.addAttribute("idActivo", idActivo);
+        vista.addAttribute("resultado", true);
+        return "mk11";
     }
 }

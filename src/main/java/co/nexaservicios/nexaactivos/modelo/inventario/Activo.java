@@ -11,6 +11,7 @@
  *           buscarPorId(), buscarPorNumeroSerie(), buscarPorPlaca()
  *           listarInventario()
  *           actualizar()
+ *           darDeBaja()
  * HU      : HU-01, HU-02, HU-03, HU-04
  * RF      : HU-01: RF-01, RF-02, RF-52; HU-02: RF-03, RF-56; HU-03: RF-04, RF-51, RF-53, RF-54, RF-55, RF-60; HU-04: RF-05, RF-57, RF-58, RF-59, RF-164
  * CU      : CU-01 (Tabla 8 y Figura 6 de 3.7; incluye CU-48 y CU-49); CU-02, CU-03 y CU-04 (no documentados)
@@ -37,6 +38,7 @@
  * 1.3     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-03: buscarPorId(), buscarPorNumeroSerie(), buscarPorPlaca()
  * 1.4     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-56: listarInventario()
  * 1.5     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-04: actualizar()
+ * 1.6     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-05: darDeBaja() con UPDATE (Estado = 'Baja'), nunca DELETE
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.modelo.inventario;
@@ -135,6 +137,12 @@ public class Activo {
             + "Ubicacion = ?, ID_Categoria = ? WHERE ID_Activo = ?",
             a.getMarca(), a.getModelo(), a.getEstado().name(), a.getNumeroSerie(), a.getPlacaInventario(),
             a.getUbicacion(), a.getIdCategoria(), a.getIdActivo());
+    }
+
+    /** darDeBaja(idActivo : int) : void · HU-04, RF-05. Baja lógica: UPDATE, jamás DELETE. */
+    public void darDeBaja(int idActivo) {
+        ConexionBD.jdbc().update(
+            "UPDATE Activo SET Estado = ? WHERE ID_Activo = ?", Estado_Activo.Baja.name(), idActivo);
     }
 
     // ----- Accesores (D-13). ID_Activo sin setter: {PK, readOnly} -----
