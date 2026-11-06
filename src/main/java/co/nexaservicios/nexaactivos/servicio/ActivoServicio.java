@@ -46,6 +46,7 @@
  * 1.0     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
  * 1.1     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-01: crear() con obligatorios, longitudes y categoría existente
  * 1.2     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-02: crear() rechaza serie o placa registradas (RN-A03, RN-A04)
+ * 1.3     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-52: crear() rechaza categoría inactiva (RN-A09)
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
@@ -65,6 +66,7 @@ public class ActivoServicio {
     public static final String M_05 = "El número de serie no puede superar 20 caracteres.";
     public static final String M_06 = "El número de serie ya está registrado.";
     public static final String M_07 = "La categoría es obligatoria.";
+    public static final String M_08 = "La categoría seleccionada está inactiva.";
     public static final String M_09 = "La categoría seleccionada no existe.";
     public static final String M_10 = "La marca es obligatoria.";
     public static final String M_11 = "La marca no puede superar 50 caracteres.";
@@ -108,6 +110,8 @@ public class ActivoServicio {
         Categoria c = categoriaServicio.buscarPorId(a.getIdCategoria());
         // Categoría inexistente · restricción del diccionario (FK); RF-01
         if (c == null) throw new IllegalArgumentException(M_09);
+        // Categoría inactiva · RN-A09; RF-52
+        if (!c.isActivo()) throw new IllegalArgumentException(M_08);
         // Mensaje 8 · paso 7 · RF-01
         modeloActivo.crear(a);
     }
