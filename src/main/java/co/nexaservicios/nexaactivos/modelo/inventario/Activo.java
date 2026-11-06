@@ -10,6 +10,7 @@
  *           existeNumeroSerie() «INTERNO», existePlaca() «INTERNO»
  *           buscarPorId(), buscarPorNumeroSerie(), buscarPorPlaca()
  *           listarInventario()
+ *           actualizar()
  * HU      : HU-01, HU-02, HU-03, HU-04
  * RF      : HU-01: RF-01, RF-02, RF-52; HU-02: RF-03, RF-56; HU-03: RF-04, RF-51, RF-53, RF-54, RF-55, RF-60; HU-04: RF-05, RF-57, RF-58, RF-59, RF-164
  * CU      : CU-01 (Tabla 8 y Figura 6 de 3.7; incluye CU-48 y CU-49); CU-02, CU-03 y CU-04 (no documentados)
@@ -35,6 +36,7 @@
  * 1.2     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-02: existeNumeroSerie() y existePlaca() «INTERNO»
  * 1.3     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-03: buscarPorId(), buscarPorNumeroSerie(), buscarPorPlaca()
  * 1.4     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-56: listarInventario()
+ * 1.5     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-04: actualizar()
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.modelo.inventario;
@@ -124,6 +126,15 @@ public class Activo {
     /** listarInventario() : List<Activo> · HU-02, RF-56. Todos los estados, por placa de menor a mayor. */
     public List<Activo> listarInventario() {
         return ConexionBD.jdbc().query(COLUMNAS + "ORDER BY Placa_Inventario ASC", FILA);
+    }
+
+    /** actualizar(a : Activo) : void · HU-03, RF-04. No modifica ID_Activo (PK, readOnly). */
+    public void actualizar(Activo a) {
+        ConexionBD.jdbc().update(
+            "UPDATE Activo SET Marca = ?, Modelo = ?, Estado = ?, Numero_Serie = ?, Placa_Inventario = ?, "
+            + "Ubicacion = ?, ID_Categoria = ? WHERE ID_Activo = ?",
+            a.getMarca(), a.getModelo(), a.getEstado().name(), a.getNumeroSerie(), a.getPlacaInventario(),
+            a.getUbicacion(), a.getIdCategoria(), a.getIdActivo());
     }
 
     // ----- Accesores (D-13). ID_Activo sin setter: {PK, readOnly} -----

@@ -49,11 +49,13 @@
  * 1.3     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-52: crear() rechaza categoría inactiva (RN-A09)
  * 1.4     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-03: buscarPorId(), buscarPorNumeroSerie(), buscarPorPlaca()
  * 1.5     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-56: listarInventario()
+ * 1.6     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-04: actualizar()
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
 
 import co.nexaservicios.nexaactivos.modelo.catalogos.Categoria;
+import co.nexaservicios.nexaactivos.modelo.enumeraciones.Estado_Activo;
 import co.nexaservicios.nexaactivos.modelo.inventario.Activo;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -81,6 +83,9 @@ public class ActivoServicio {
     public static final String M_17 = "No se encontró ningún activo con esa placa de inventario.";
     public static final String M_18 = "No se encontró ningún activo con ese identificador.";
     public static final String M_19 = "No se encontró ningún activo con ese número de serie.";
+    public static final String M_20 = "Activo actualizado correctamente.";
+    public static final String M_21 = "El activo no existe.";
+    public static final String M_24 = "El estado no es válido.";
 
     private final Activo modeloActivo = new Activo();
     private final CategoriaServicio categoriaServicio;
@@ -154,5 +159,35 @@ public class ActivoServicio {
     public List<Activo> listarInventario() {
         // Todos los estados, por placa de menor a mayor · sin RN; RF-56
         return modeloActivo.listarInventario();
+    }
+
+    /**
+     * actualizar(a : Activo) · HU-03 · CU-03 (no documentado). ID_Activo es
+     * {PK, readOnly}: identifica el activo y no se modifica (M-25 sin camino).
+     */
+    public void actualizar(Activo a) {
+        // Activo inexistente · sin RN; RF-04 (HU-03 CA-7)
+        Activo actual = a.getIdActivo() == null ? null : modeloActivo.buscarPorId(a.getIdActivo());
+        if (actual == null) throw new IllegalArgumentException(M_21);
+        // Obligatorios · restricción del diccionario (NOT NULL); RF-04
+        if (a.getMarca() == null || a.getMarca().isBlank()) throw new IllegalArgumentException(M_10);
+        if (a.getModelo() == null || a.getModelo().isBlank()) throw new IllegalArgumentException(M_02);
+        if (a.getNumeroSerie() == null || a.getNumeroSerie().isBlank()) throw new IllegalArgumentException(M_04);
+        if (a.getPlacaInventario() == null || a.getPlacaInventario().isBlank()) throw new IllegalArgumentException(M_12);
+        if (a.getIdCategoria() == null) throw new IllegalArgumentException(M_07);
+        // Longitudes · restricción del diccionario (longitud VARCHAR); RF-04
+        if (a.getMarca().length() > 50) throw new IllegalArgumentException(M_11);
+        if (a.getModelo().length() > 50) throw new IllegalArgumentException(M_03);
+        if (a.getNumeroSerie().length() > 20) throw new IllegalArgumentException(M_05);
+        if (a.getPlacaInventario().length() > 11) throw new IllegalArgumentException(M_13);
+        if (a.getUbicacion() != null && a.getUbicacion().length() > 100) throw new IllegalArgumentException(M_15);
+        // Estado vacío o fuera del ENUM · restricción del diccionario (ENUM Estado_Activo); RF-04
+        if (a.getEstado() == null) throw new IllegalArgumentException(M_24);
+        // Ubicacion opcional · restricción del diccionario: vacía se guarda como NULL; RF-04
+        if (a.getUbicacion() != null && a.getUbicacion().isBlank()) a.setUbicacion(null);
+        Categoria c = categoriaServicio.buscarPorId(a.getIdCategoria());
+        // Categoría inexistente · restricción del diccionario (FK); RF-04
+        if (c == null) throw new IllegalArgumentException(M_09);
+        modeloActivo.actualizar(a);
     }
 }

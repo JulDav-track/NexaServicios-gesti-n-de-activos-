@@ -4,21 +4,61 @@
   NexaActivos - Nexa Servicios S.A.S. · Ingeniería de Software II
   Archivo : src/main/resources/templates/mk10.html
   Capa    : Vista (DDA 3.6 v3_GenC, Tablas 3 y 6)
-  MK      : MK-10 Actualizar activo (mockups 2.5)
-  Controlador: ActivoControlador
-  HU      : HU-03
+  MK      : MK-10 Actualizar activo (mockups 2.5, Tablas 21 y 22)
+  Controlador: ActivoControlador (actualizar)
+  HU      : HU-03 · RF-04, RF-51, RF-53, RF-54, RF-55, RF-60 · CU-03 (no documentado)
+  Campos  : ID_Activo solo lectura (clave, no se modifica; M-25 sin camino);
+            Marca, Modelo, Numero_Serie, Placa_Inventario, Ubicacion (opcional),
+            ID_Categoria y Estado (lista editable con los 4 valores del ENUM,
+            para que los cambios no permitidos se rechacen con su mensaje).
+  Navega a: MK-01 («Cancelar»), MK-11 («Dar de baja»).
   La Vista no valida RN ni invoca el Modelo.
   CRF     : CRF-003 · Línea base: LB-1
-  Estado  : esqueleto. El contenido de la pantalla se agrega cuando su HU
-            entre al corte vertical. Propuesta del equipo, pendiente de validar.
+  Estado  : corte vertical. Propuesta del equipo, pendiente de validar.
   Versión 1.0 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
+  Versión 1.1 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-04: formulario de actualización y mensajes
   =====================================================================
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>NexaActivos - MK-10 Actualizar activo</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 15px; margin: 24px; }
+    .sesion { background: #1F2A5C; color: #fff; padding: 6px 10px; }
+    .exito { color: #0b6b2e; font-weight: bold; }
+    .error { color: #b00020; font-weight: bold; }
+    .info { color: #333; font-style: italic; }
+    label { display: inline-block; width: 170px; }
+    table { border-collapse: collapse; }
+    th { background: #1F2A5C; color: #fff; }
+    th, td { border: 1px solid #999; padding: 4px 8px; }
+  </style>
 </head>
 <body>
+  <p class="sesion">Usuario en sesión (ID_Usuario):
+    <span th:text="${@sesionActual.idUsuario != null ? @sesionActual.idUsuario : 'sin sesión'}">-</span>
+    · Rol: <span th:text="${@sesionActual.rol != null ? #strings.replace(@sesionActual.rol.name(), '_', ' ') : 'sin sesión'}">-</span>
+    (sesión de prueba, P-62; RNF-02)</p>
+  <h1>MK-10 Actualizar activo</h1>
+  <p th:if="${mensajeExito}" class="exito" th:text="${mensajeExito}"></p>
+  <p th:if="${mensajeError}" class="error" th:text="${mensajeError}"></p>
+  <form th:if="${activo}" method="post" th:action="@{/activos/{id}/editar(id=${activo.idActivo})}">
+    <p><label>ID_Activo</label> <input type="text" th:value="${activo.idActivo}" readonly> (clave; no se modifica)</p>
+    <p><label for="marca">Marca</label> <input id="marca" name="marca" type="text" th:value="${activo.marca}"></p>
+    <p><label for="modelo">Modelo</label> <input id="modelo" name="modelo" type="text" th:value="${activo.modelo}"></p>
+    <p><label for="numeroSerie">Numero_Serie</label> <input id="numeroSerie" name="numeroSerie" type="text" th:value="${activo.numeroSerie}"></p>
+    <p><label for="placaInventario">Placa_Inventario</label> <input id="placaInventario" name="placaInventario" type="text" th:value="${activo.placaInventario}"></p>
+    <p><label for="ubicacion">Ubicacion (opcional)</label> <input id="ubicacion" name="ubicacion" type="text" th:value="${activo.ubicacion}"></p>
+    <p><label for="idCategoria">ID_Categoria</label> <input id="idCategoria" name="idCategoria" type="number" th:value="${activo.idCategoria}"></p>
+    <p><label for="estado">Estado</label>
+      <select id="estado" name="estado">
+        <option th:each="e : ${estados}" th:value="${e}" th:text="${e}" th:selected="${e == activo.estado}"></option>
+      </select></p>
+    <p><button type="submit">Guardar cambios</button>
+       <a th:href="@{/activos}">Cancelar (navega a MK-01)</a>
+    </p>
+  </form>
+  <p th:unless="${activo}"><a th:href="@{/activos}">Volver a MK-01</a></p>
 </body>
 </html>

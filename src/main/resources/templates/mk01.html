@@ -17,6 +17,7 @@
   Versión 1.0 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
   Versión 1.1 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-03: búsqueda por ID_Activo, Numero_Serie o Placa_Inventario y ficha de 8 campos
   Versión 1.2 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-56: tabla de 6 columnas ordenada por placa y M-16
+  Versión 1.3 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-04: botón «Editar» (navega a MK-10)
   =====================================================================
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
@@ -88,6 +89,7 @@
       <td th:text="${a.numeroSerie}"></td>
       <td th:text="${a.estado}"></td>
       <td>
+        <a th:href="@{/activos/{id}/editar(id=${a.idActivo})}">Editar</a>
       </td>
     </tr>
   </table>
