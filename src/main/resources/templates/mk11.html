@@ -9,6 +9,9 @@
   HU      : HU-04 · RF-05, RF-57, RF-58, RF-59, RF-164 · CU-04 (no documentado)
   Campos  : datos del activo en solo lectura, recibidos de MK-01 o MK-10:
             Placa_Inventario, Estado, Marca y Modelo.
+  Aviso   : M-30 con la placa del activo (RF-59). «Desistir» muestra M-29 en
+            la misma Vista, sin llamar al Controlador (como el flujo 7a de
+            CU-24 en 3.7); el activo no se modifica.
   Rechazos: M-21, M-31 y M-32 los responde el Servicio al confirmar. En HU-04
             CA-3 y CA-4 la historia pide no mostrar el aviso; aquí el aviso se
             muestra y el rechazo llega al confirmar (ver README, observación
@@ -18,6 +21,7 @@
   Estado  : corte vertical. Propuesta del equipo, pendiente de validar.
   Versión 1.0 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
   Versión 1.1 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-05: confirmación de la baja y resultado
+  Versión 1.2 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-59: aviso M-30 y «Desistir» con M-29
   =====================================================================
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
@@ -47,9 +51,15 @@
       <tr><th>Placa_Inventario</th><th>Estado</th><th>Marca</th><th>Modelo</th></tr>
       <tr><td th:text="${placa}"></td><td th:text="${estado}"></td><td th:text="${marca}"></td><td th:text="${modelo}"></td></tr>
     </table>
+    <p class="info" th:text="${aviso}"></p>
     <form method="post" th:action="@{/activos/{id}/baja(id=${idActivo})}">
       <button type="submit">Confirmar baja</button>
+      <button type="button" onclick="document.getElementById('aviso').style.display='none';document.getElementById('desistio').style.display='block';">Desistir</button>
     </form>
+  </div>
+  <div id="desistio" style="display:none">
+    <p class="info" th:text="${m29}"></p>
+    <p><a th:href="@{/activos}">Volver a MK-01</a></p>
   </div>
   <div th:if="${resultado}">
     <p th:if="${mensajeExito}" class="exito" th:text="${mensajeExito}"></p>

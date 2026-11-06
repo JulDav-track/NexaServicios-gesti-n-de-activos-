@@ -58,6 +58,7 @@
  * 1.12    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-05: darDeBaja() con UPDATE del Estado a Baja
  * 1.13    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-57: darDeBaja() rechaza un activo ya en Baja (RN-A18)
  * 1.14    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-58: darDeBaja() rechaza un activo con asignación vigente (RN-A19)
+ * 1.15    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-59: textos del aviso M-30 y del desistimiento M-29
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
@@ -99,6 +100,9 @@ public class ActivoServicio {
     public static final String M_26 = "Un activo asignado no puede cambiar de estado hasta cerrar su asignación.";
     public static final String M_27 = "Un activo en baja no se puede editar.";
     public static final String M_28 = "Activo dado de baja correctamente.";
+    public static final String M_29 = "Baja cancelada. El activo no fue modificado.";
+    public static final String M_30 = "El activo <placa> pasará a estado Baja y dejará de estar disponible para asignarse. "
+                                    + "El registro no se elimina. ¿Desea continuar?";
     public static final String M_31 = "El activo está asignado. Cierre su asignación antes de darlo de baja.";
     public static final String M_32 = "El activo ya está dado de baja.";
 
@@ -231,6 +235,8 @@ public class ActivoServicio {
     /**
      * darDeBaja(idActivo : int) · HU-04 · CU-04 (no documentado). Baja lógica:
      * Activo.darDeBaja() hace UPDATE del Estado a 'Baja', jamás DELETE.
+     * Se invoca solo después de que el actor confirma el aviso M-30 en MK-11
+     * (RF-59); si desiste, la Vista responde M-29 sin llamar al Controlador.
      */
     public void darDeBaja(int idActivo) {
         // Activo inexistente · sin RN; RF-05 (HU-04 CA-5)

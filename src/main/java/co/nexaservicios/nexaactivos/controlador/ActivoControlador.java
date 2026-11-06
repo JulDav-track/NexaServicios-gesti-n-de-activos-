@@ -37,6 +37,7 @@
  * 1.3     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-56: listarInventario() hacia MK-01
  * 1.4     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-04: actualizar() hacia MK-10
  * 1.5     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-05: darDeBaja() hacia MK-11
+ * 1.6     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-59: aviso M-30 antes de confirmar y texto M-29 para desistir
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.controlador;
@@ -208,6 +209,9 @@ public class ActivoControlador {
         vista.addAttribute("estado", estado);
         vista.addAttribute("marca", marca);
         vista.addAttribute("modelo", modelo);
+        // Aviso de consecuencia M-30 con la placa y texto M-29 para desistir · RF-59
+        vista.addAttribute("aviso", ActivoServicio.M_30.replace("<placa>", placa));
+        vista.addAttribute("m29", ActivoServicio.M_29);
         return "mk11";
     }
 
