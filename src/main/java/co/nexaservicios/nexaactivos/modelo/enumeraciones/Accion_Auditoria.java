@@ -7,16 +7,18 @@
  * Uso     : Auditoria.Accion
  * Valores : 'Crear','Consultar','Actualizar','Inactivar','Aprobar','Rechazar','Notificar','Asignar','Devolver','Reportar'
  *           (Diccionario v7; iguales al ENUM de db/nexaactivos_ddl.sql v1.2)
+ * Orden   : el de declaración del Diccionario v7 (el mismo índice del ENUM).
+ *           Solo constantes: la enumeración no tiene métodos (diagrama v6).
  * CRF     : CRF-003 · Línea base: LB-1
- * Estado  : esqueleto. Las constantes Java y su correspondencia con los
- *           valores de la base se agregan en la entrega del corte vertical.
- *           Propuesta del equipo, pendiente de validar.
+ * Estado  : constantes completas. Propuesta del equipo, pendiente de validar.
  *
  * Versión | Fecha      | Autores | Cambio
  * 1.0     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
+ * 1.1     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Constantes del Diccionario v7 (corte vertical 4.3, HU-04 RF-164 (Auditoria.Accion = Inactivar))
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.modelo.enumeraciones;
 
 public enum Accion_Auditoria {
+    Crear, Consultar, Actualizar, Inactivar, Aprobar, Rechazar, Notificar, Asignar, Devolver, Reportar
 }

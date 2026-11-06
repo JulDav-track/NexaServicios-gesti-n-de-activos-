@@ -59,15 +59,20 @@
  * 1.13    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-57: darDeBaja() rechaza un activo ya en Baja (RN-A18)
  * 1.14    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-58: darDeBaja() rechaza un activo con asignación vigente (RN-A19)
  * 1.15    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-59: textos del aviso M-30 y del desistimiento M-29
+ * 1.16    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-164: darDeBaja() registra la auditoría (Inactivar; RN-T02a)
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
 
 import co.nexaservicios.nexaactivos.modelo.catalogos.Categoria;
+import co.nexaservicios.nexaactivos.modelo.enumeraciones.Accion_Auditoria;
 import co.nexaservicios.nexaactivos.modelo.enumeraciones.Estado_Activo;
 import co.nexaservicios.nexaactivos.modelo.inventario.Activo;
+import co.nexaservicios.nexaactivos.modelo.seguridad_acceso.Auditoria;
+import co.nexaservicios.nexaactivos.soporte.SesionActual;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ActivoServicio {
@@ -109,10 +114,15 @@ public class ActivoServicio {
     private final Activo modeloActivo = new Activo();
     private final CategoriaServicio categoriaServicio;
     private final AsignacionServicio asignacionServicio;
+    private final AuditoriaServicio auditoriaServicio;
+    private final SesionActual sesion;
 
-    public ActivoServicio(CategoriaServicio categoriaServicio, AsignacionServicio asignacionServicio) {
+    public ActivoServicio(CategoriaServicio categoriaServicio, AsignacionServicio asignacionServicio,
+                          AuditoriaServicio auditoriaServicio, SesionActual sesion) {
         this.categoriaServicio = categoriaServicio;
         this.asignacionServicio = asignacionServicio;
+        this.auditoriaServicio = auditoriaServicio;
+        this.sesion = sesion;
     }
 
     /**
@@ -238,6 +248,7 @@ public class ActivoServicio {
      * Se invoca solo después de que el actor confirma el aviso M-30 en MK-11
      * (RF-59); si desiste, la Vista responde M-29 sin llamar al Controlador.
      */
+    @Transactional
     public void darDeBaja(int idActivo) {
         // Activo inexistente · sin RN; RF-05 (HU-04 CA-5)
         Activo actual = modeloActivo.buscarPorId(idActivo);
@@ -248,5 +259,13 @@ public class ActivoServicio {
         if (asignacionServicio.buscarVigentePorActivo(idActivo) != null) throw new IllegalArgumentException(M_31);
         // Estado = Baja, conserva los demás datos · RF-05 (RN-A16b: Baja solo al darse de baja)
         modeloActivo.darDeBaja(idActivo);
+        // La baja queda registrada con quién y cuándo · RN-T02a; RF-164 (acción Inactivar, entidad Activo)
+        Auditoria aud = new Auditoria();
+        aud.setIdUsuario(sesion.getIdUsuario());
+        aud.setEntidad("Activo");
+        aud.setIdRegistro(idActivo);
+        aud.setAccion(Accion_Auditoria.Inactivar);
+        aud.setDetalle("Baja del activo " + actual.getPlacaInventario());
+        auditoriaServicio.registrar(aud);
     }
 }
