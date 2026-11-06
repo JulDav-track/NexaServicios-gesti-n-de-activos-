@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  =====================================================================
+  NexaActivos - Nexa Servicios S.A.S. · Ingeniería de Software II
+  Uniremington 2026-02 · Docente: Gloria Amparo Lora Patiño
+  Archivo : pom.xml (raíz del repositorio)
+  Capa    : construcción (Maven). Diferencia declarada D-08 con la Tabla 6
+            del DDA 3.6 v3_GenC, que no lista este archivo (ver README).
+  Tecnología: Spring Boot (web y Thymeleaf) con Spring JDBC y el controlador
+            JDBC de MariaDB. NO incluye spring-boot-starter-data-jpa: el DDA
+            excluye la capa de repositorio (supuesto 2) y deja el acceso a
+            datos en los métodos de las clases del modelo (Tabla 1). El uso
+            de Spring JDBC en lugar de JPA es la diferencia D-12 (supuesto 1
+            del DDA: tecnología no fijada). Versiones: propuesta del equipo.
+  CU/HU   : corte vertical de Activo (CU-01; HU-01 a HU-04), sección 4.3.
+  CRF     : CRF-003 · Línea base: LB-1
+  Versión 1.0 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Inicial (corte vertical 4.3, base técnica)
+  =====================================================================
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.3.5</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>co.nexaservicios</groupId>
+  <artifactId>nexaactivos</artifactId>
+  <version>0.1.0</version>
+  <name>NexaActivos</name>
+  <description>Sistema de gestión de activos de Nexa Servicios S.A.S. (corte vertical 4.3)</description>
+
+  <properties>
+    <java.version>17</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mariadb.jdbc</groupId>
+      <artifactId>mariadb-java-client</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

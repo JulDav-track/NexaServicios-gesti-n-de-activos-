@@ -12,12 +12,15 @@ Este repositorio es la imagen del plano de carpetas del Documento de Diseño Arq
 ├── .gitignore                      exclusiones (compilados, IDE, registros, credenciales)
 ├── .gitattributes                  *.sql -text: Git no altera los scripts SQL
 ├── README.md
+├── pom.xml                         construcción con Maven (D-08)
 ├── db/
 │   ├── nexaactivos_ddl.sql         DDL v1.2 aprobado (sección 4.1), copia byte a byte
 │   └── datos_prueba.sql            datos de prueba v1.0 (solo INSERT), copia byte a byte
 ├── docs/                           documentos .md de las Fases 0 y 1 (contexto, objetivos, análisis)
 └── src/main/
     ├── java/co/nexaservicios/nexaactivos/
+    │   ├── NexaActivosAplicacion.java  arranque de Spring Boot (D-09)
+    │   ├── soporte/                ConexionBD (D-10) y SesionActual (D-11)
     │   ├── modelo/
     │   │   ├── seguridad_acceso/   Usuario, Auditoria, Rol_Permiso (3)
     │   │   ├── prestamo_equipos/   Solicitud, Aprobacion, Custodio, Asignacion,
@@ -33,9 +36,11 @@ Este repositorio es la imagen del plano de carpetas del Documento de Diseño Arq
         └── templates/              mk01.html a mk13.html (MK-01 a MK-13, mockups 2.5)
 ```
 
-No hay capa de repositorio (ni JpaRepository ni CrudRepository): el DDA la excluye (supuesto 2); adoptarla sería un cambio al DDA y exigiría un CRF. En esta versión las clases son esqueletos con cabecera de trazabilidad; el código del corte vertical (sección 4.3) se agrega después, un commit por RF.
+No hay capa de repositorio (ni JpaRepository ni CrudRepository): el DDA la excluye (supuesto 2); adoptarla sería un cambio al DDA y exigiría un CRF. Las clases que no entran en el corte vertical siguen como esqueletos con cabecera de trazabilidad; el código del corte (sección 4.3) se agrega un commit por RF (ver «Corte vertical»).
 
 ### Diferencias declaradas con la Tabla 6 del DDA 3.6 v3_GenC
+
+En las cabeceras de los archivos fuente cada fila se cita como D-01 a D-17 (por ejemplo, la fila 8 es D-08).
 
 | N.º | Diferencia | Motivo |
 | --- | --- | --- |
@@ -46,6 +51,35 @@ No hay capa de repositorio (ni JpaRepository ni CrudRepository): el DDA la exclu
 | 5 | Paquete base `co.nexaservicios.nexaactivos` | La Tabla 6 deja el paquete base para la Fase 3; este nombre es propuesta del equipo. |
 | 6 | Nombre de la raíz | La Tabla 6 propone `nexaactivos/`; el repositorio conserva su nombre en GitHub. |
 | 7 | Nombres de las plantillas `mk01.html` a `mk13.html` | La Tabla 6 fija una plantilla por pantalla, sin nombre de archivo. |
+| 8 | `pom.xml` | Construcción con Maven: Spring Boot (web y Thymeleaf), Spring JDBC y el controlador de MariaDB; sin `spring-boot-starter-data-jpa`. Versiones: propuesta del equipo. |
+| 9 | `NexaActivosAplicacion.java` en el paquete base | Clase de arranque que exige Spring Boot; no tiene lógica. |
+| 10 | `soporte/ConexionBD.java` | Entrega el `JdbcTemplate` a los métodos de las clases del modelo, donde el DDA deja el acceso a datos (Tabla 1), y comprueba al arrancar que la sesión tenga `STRICT_TRANS_TABLES`. No es un repositorio ni valida RN. |
+| 11 | `soporte/SesionActual.java` | Guarda por sesión HTTP el ID_Usuario y el rol del usuario con sesión (RNF-02; en 3.7 llegan con la petición). Mientras P-62 siga abierta, cada sesión toma un usuario de prueba de `application.properties`. |
+| 12 | Spring JDBC en lugar de JPA | El supuesto 1 del DDA propone Spring Boot, Thymeleaf y JPA sin fijarlos. Con JPA el acceso a datos suele salir del modelo hacia repositorios o un `EntityManager`; con Spring JDBC queda dentro de los métodos de las clases del modelo, como pide la Tabla 1, y sin capa de repositorio. Pendiente de la docente. |
+| 13 | Accesores get/set y constructores | Convención Java para leer y escribir los atributos privados; no son operaciones del diagrama. Las PK `{PK, readOnly}` no tienen setter: se fijan en el constructor. |
+| 14 | Modo estricto por `connection-init-sql` | Cada conexión fija `sql_mode` con `STRICT_TRANS_TABLES` (equivale a `sessionVariables` en la URL JDBC, pero sin el problema de las comas dentro del valor). |
+| 15 | Rechazos como excepciones estándar | El Servicio rechaza con `IllegalArgumentException` (texto M-xx) o `SecurityException` (rechazo por rol); los textos M-xx son constantes `M_xx` de cada Servicio, idénticas al catálogo E del Consolidado. |
+| 16 | Constantes de `Nombre_Rol` con guion bajo | Java no admite espacios: `Responsable_de_Activos` y `Técnico_de_Soporte` se guardan en la base como 'Responsable de Activos' y 'Técnico de Soporte'. |
+| 17 | Métodos GET del Controlador con el mismo nombre | Para mostrar MK-02, MK-10 y MK-11 antes de enviar, el Controlador tiene métodos GET con el nombre de la operación y otros parámetros (por ejemplo `crear(Model)` y `crear(Activo, Model)`). |
+
+## Corte vertical (sección 4.3)
+
+Propuesta del equipo, pendiente de validar con la docente. Entidad Activo, CU-01 (Tabla 8 y Figura 6 de 3.7) y HU-01 a HU-04, con las pantallas MK-01, MK-02, MK-10 y MK-11. Además, del resto del modelo solo se implementan los métodos que el corte invoca: `CategoriaServicio.buscarPorId()` («include» CU-48), `AsignacionServicio.buscarVigentePorActivo()` (asignación vigente, RN-A16a y RN-A19), `AuditoriaServicio.registrar()` (baja, RF-164) y `RolPermisoServicio.consultarPermisos()` (RF-166). Las demás clases siguen como esqueletos.
+
+- Cadena: Vista (Thymeleaf) → `ActivoControlador` → `ActivoServicio` → `Activo`, en el orden de la Tabla 8 de 3.7. Las RN viven solo en los Servicios; el Controlador y las plantillas no validan RN.
+- Baja lógica: `Activo.darDeBaja()` hace `UPDATE Activo SET Estado = 'Baja'`; el código no tiene ningún `DELETE`.
+- Un commit por RF, en el orden de las filas HU-01 a HU-04 de la matriz 3.9 v2, y al final RF-166 (fila HU-38, transversal). Antes va un commit de base técnica sin RF (D-08 a D-17).
+- Usuario con sesión: nadie puede iniciar sesión mientras P-62 siga abierta (contraseñas «SIN_DEFINIR_P-62»). La sesión de prueba toma el usuario de `nexa.sesion-prueba.id-usuario` y el rol de `nexa.sesion-prueba.rol` (por omisión 1, Responsable de Activos). Para probar el rechazo por rol, antes de arrancar: `set NEXA_SESION_ID_USUARIO=2` y `set NEXA_SESION_ROL=Empleado` (el Empleado no tiene permisos en `datos_prueba.sql`).
+- Observación (pendiente de la docente): HU-04 CA-3 y CA-4 piden no mostrar el aviso M-30 cuando el activo ya está en Baja o está asignado. El diagrama v6 no tiene un método de prevalidación y la Vista no valida RN, así que MK-11 muestra el aviso y el rechazo (M-32 o M-31) llega al confirmar.
+
+Compilar y correr (Windows, JDK 17 o superior y Maven 3.9; la base ya creada con `db\nexaactivos_ddl.sql` y `db\datos_prueba.sql`):
+
+```
+mvn -q -DskipTests package > salida_compilacion.txt 2>&1
+mvn spring-boot:run > salida_ejecucion.txt 2>&1
+```
+
+Luego abrir `http://localhost:8080/activos`. Las salidas `salida_*.txt` están excluidas en `.gitignore`.
 
 ## Base de datos
 
@@ -100,3 +134,4 @@ M2 pendiente de decisión de la docente; la lectura del acta 3.10 v4 fue interna
 | Versión | Fecha | Autores | Cambio |
 | --- | --- | --- | --- |
 | 1.0 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Estructura del DDA, base de datos, clave, reglas GCS y LB-1 (sección 4.2) |
+| 1.1 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Corte vertical (sección 4.3): diferencias D-08 a D-17, sesión de prueba, compilar y correr |
