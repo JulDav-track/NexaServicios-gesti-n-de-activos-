@@ -53,6 +53,7 @@
  * 1.7     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-51: actualizar() verifica unicidad sin contar al propio activo (RN-A03, RN-A04)
  * 1.8     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-53: actualizar() rechaza categoría inactiva (RN-A09)
  * 1.9     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-54: actualizar() solo corrige entre Disponible y Dañado (RN-A16b)
+ * 1.10    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-55: actualizar() rechaza un activo en Baja (RN-A18)
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
@@ -92,6 +93,7 @@ public class ActivoServicio {
     public static final String M_23 = "El estado Baja solo se asigna dando de baja el activo.";
     public static final String M_24 = "El estado no es válido.";
     public static final String M_26 = "Un activo asignado no puede cambiar de estado hasta cerrar su asignación.";
+    public static final String M_27 = "Un activo en baja no se puede editar.";
 
     private final Activo modeloActivo = new Activo();
     private final CategoriaServicio categoriaServicio;
@@ -175,6 +177,8 @@ public class ActivoServicio {
         // Activo inexistente · sin RN; RF-04 (HU-03 CA-7)
         Activo actual = a.getIdActivo() == null ? null : modeloActivo.buscarPorId(a.getIdActivo());
         if (actual == null) throw new IllegalArgumentException(M_21);
+        // Activo en Baja · RN-A18; RF-55 (HU-03 CA-6)
+        if (actual.getEstado() == Estado_Activo.Baja) throw new IllegalArgumentException(M_27);
         // Obligatorios · restricción del diccionario (NOT NULL); RF-04
         if (a.getMarca() == null || a.getMarca().isBlank()) throw new IllegalArgumentException(M_10);
         if (a.getModelo() == null || a.getModelo().isBlank()) throw new IllegalArgumentException(M_02);
