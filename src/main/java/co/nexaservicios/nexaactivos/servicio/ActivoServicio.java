@@ -47,6 +47,7 @@
  * 1.1     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-01: crear() con obligatorios, longitudes y categoría existente
  * 1.2     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-02: crear() rechaza serie o placa registradas (RN-A03, RN-A04)
  * 1.3     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-52: crear() rechaza categoría inactiva (RN-A09)
+ * 1.4     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-03: buscarPorId(), buscarPorNumeroSerie(), buscarPorPlaca()
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
@@ -74,6 +75,9 @@ public class ActivoServicio {
     public static final String M_13 = "La placa de inventario no puede superar 11 caracteres.";
     public static final String M_14 = "La placa de inventario ya está registrada.";
     public static final String M_15 = "La ubicación no puede superar 100 caracteres.";
+    public static final String M_17 = "No se encontró ningún activo con esa placa de inventario.";
+    public static final String M_18 = "No se encontró ningún activo con ese identificador.";
+    public static final String M_19 = "No se encontró ningún activo con ese número de serie.";
 
     private final Activo modeloActivo = new Activo();
     private final CategoriaServicio categoriaServicio;
@@ -114,5 +118,29 @@ public class ActivoServicio {
         if (!c.isActivo()) throw new IllegalArgumentException(M_08);
         // Mensaje 8 · paso 7 · RF-01
         modeloActivo.crear(a);
+    }
+
+    /** buscarPorId(idActivo : int) · HU-02 · CU-02 (no documentado). */
+    public Activo buscarPorId(int idActivo) {
+        Activo a = modeloActivo.buscarPorId(idActivo);
+        // Activo no encontrado · sin RN; RF-03 (HU-02 CA-4)
+        if (a == null) throw new IllegalArgumentException(M_18);
+        return a;
+    }
+
+    /** buscarPorNumeroSerie(numeroSerie : String) · HU-02 · CU-02 (no documentado). */
+    public Activo buscarPorNumeroSerie(String numeroSerie) {
+        Activo a = modeloActivo.buscarPorNumeroSerie(numeroSerie);
+        // Activo no encontrado · sin RN; RF-03 (HU-02 CA-4)
+        if (a == null) throw new IllegalArgumentException(M_19);
+        return a;
+    }
+
+    /** buscarPorPlaca(placa : String) · HU-02 · CU-02 (no documentado). */
+    public Activo buscarPorPlaca(String placa) {
+        Activo a = modeloActivo.buscarPorPlaca(placa);
+        // Activo no encontrado · sin RN; RF-03 (HU-02 CA-4)
+        if (a == null) throw new IllegalArgumentException(M_17);
+        return a;
     }
 }

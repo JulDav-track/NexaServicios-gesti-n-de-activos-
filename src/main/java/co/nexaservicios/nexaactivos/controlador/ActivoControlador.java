@@ -14,6 +14,8 @@
  *           el método GET lleva el mismo nombre con otros parámetros (D-17).
  *           crear()            GET  /activos/nuevo           -> MK-02
  *           crear(a)           POST /activos/nuevo           -> MK-02 (mensaje 2 de la Tabla 8)
+ *           buscarPorId(), buscarPorNumeroSerie(), buscarPorPlaca()
+ *                              GET  /activos/buscar/id|serie|placa -> MK-01
  * HU      : HU-01, HU-02, HU-03, HU-04
  * RF      : HU-01: RF-01, RF-02, RF-52; HU-02: RF-03, RF-56; HU-03: RF-04, RF-51, RF-53, RF-54, RF-55, RF-60; HU-04: RF-05, RF-57, RF-58, RF-59, RF-164
  * CU      : CU-01 (Tabla 8 de 3.7, mensajes 2 y respuesta); CU-02 a CU-04 (no documentados)
@@ -26,6 +28,7 @@
  * Versión | Fecha      | Autores | Cambio
  * 1.0     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
  * 1.1     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-01: crear() hacia MK-02
+ * 1.2     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-03: búsquedas por clave hacia MK-01
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.controlador;
@@ -37,6 +40,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class ActivoControlador {
@@ -65,5 +69,38 @@ public class ActivoControlador {
             modelo.addAttribute("mensajeError", e.getMessage());
         }
         return "mk02";
+    }
+
+    /** buscarPorId(idActivo) · HU-02 (MK-01, «Buscar» por ID_Activo). Vacío = 0, que no existe (D1 del DDL). */
+    @GetMapping("/activos/buscar/id")
+    public String buscarPorId(@RequestParam(required = false) Integer idActivo, Model modelo) {
+        try {
+            modelo.addAttribute("encontrado", activoServicio.buscarPorId(idActivo == null ? 0 : idActivo));
+        } catch (IllegalArgumentException | SecurityException e) {
+            modelo.addAttribute("mensajeError", e.getMessage());
+        }
+        return "mk01";
+    }
+
+    /** buscarPorNumeroSerie(numeroSerie) · HU-02 (MK-01, «Buscar» por Numero_Serie). */
+    @GetMapping("/activos/buscar/serie")
+    public String buscarPorNumeroSerie(@RequestParam(defaultValue = "") String numeroSerie, Model modelo) {
+        try {
+            modelo.addAttribute("encontrado", activoServicio.buscarPorNumeroSerie(numeroSerie));
+        } catch (IllegalArgumentException | SecurityException e) {
+            modelo.addAttribute("mensajeError", e.getMessage());
+        }
+        return "mk01";
+    }
+
+    /** buscarPorPlaca(placa) · HU-02 (MK-01, «Buscar» por Placa_Inventario). */
+    @GetMapping("/activos/buscar/placa")
+    public String buscarPorPlaca(@RequestParam(defaultValue = "") String placa, Model modelo) {
+        try {
+            modelo.addAttribute("encontrado", activoServicio.buscarPorPlaca(placa));
+        } catch (IllegalArgumentException | SecurityException e) {
+            modelo.addAttribute("mensajeError", e.getMessage());
+        }
+        return "mk01";
     }
 }

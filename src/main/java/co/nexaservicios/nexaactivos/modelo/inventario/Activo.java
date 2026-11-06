@@ -8,6 +8,7 @@
  * Métodos : 7 públicos y 2 INTERNO en el diagrama. Implementados en el corte:
  *           crear()
  *           existeNumeroSerie() «INTERNO», existePlaca() «INTERNO»
+ *           buscarPorId(), buscarPorNumeroSerie(), buscarPorPlaca()
  * HU      : HU-01, HU-02, HU-03, HU-04
  * RF      : HU-01: RF-01, RF-02, RF-52; HU-02: RF-03, RF-56; HU-03: RF-04, RF-51, RF-53, RF-54, RF-55, RF-60; HU-04: RF-05, RF-57, RF-58, RF-59, RF-164
  * CU      : CU-01 (Tabla 8 y Figura 6 de 3.7; incluye CU-48 y CU-49); CU-02, CU-03 y CU-04 (no documentados)
@@ -31,12 +32,15 @@
  * 1.0     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
  * 1.1     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-01: atributos del Diccionario v7 y crear()
  * 1.2     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-02: existeNumeroSerie() y existePlaca() «INTERNO»
+ * 1.3     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-03: buscarPorId(), buscarPorNumeroSerie(), buscarPorPlaca()
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.modelo.inventario;
 
 import co.nexaservicios.nexaactivos.modelo.enumeraciones.Estado_Activo;
 import co.nexaservicios.nexaactivos.soporte.ConexionBD;
+import java.util.List;
+import org.springframework.jdbc.core.RowMapper;
 
 public class Activo {
 
@@ -48,6 +52,22 @@ public class Activo {
     private String placaInventario;        // Placa_Inventario VARCHAR(11)  obligatorio, UNIQUE
     private String ubicacion;              // Ubicacion        VARCHAR(100) opcional [0..1]
     private Integer idCategoria;           // ID_Categoria     INT(11)      FK hacia Categoria
+
+    // Convierte una fila de la tabla Activo en un objeto (los nombres de columna son los del DDL v1.2)
+    private static final RowMapper<Activo> FILA = (rs, n) -> {
+        Activo a = new Activo(rs.getInt("ID_Activo"));
+        a.setMarca(rs.getString("Marca"));
+        a.setModelo(rs.getString("Modelo"));
+        a.setEstado(Estado_Activo.valueOf(rs.getString("Estado")));
+        a.setNumeroSerie(rs.getString("Numero_Serie"));
+        a.setPlacaInventario(rs.getString("Placa_Inventario"));
+        a.setUbicacion(rs.getString("Ubicacion"));
+        a.setIdCategoria(rs.getInt("ID_Categoria"));
+        return a;
+    };
+
+    private static final String COLUMNAS =
+        "SELECT ID_Activo, Marca, Modelo, Estado, Numero_Serie, Placa_Inventario, Ubicacion, ID_Categoria FROM Activo ";
 
     public Activo() {
     }
@@ -79,6 +99,24 @@ public class Activo {
         Integer n = ConexionBD.jdbc().queryForObject(
             "SELECT COUNT(*) FROM Activo WHERE Placa_Inventario = ?", Integer.class, placa);
         return n != null && n > 0;
+    }
+
+    /** buscarPorId(idActivo : int) : Activo · HU-02, RF-03. Devuelve null si no existe. */
+    public Activo buscarPorId(int idActivo) {
+        List<Activo> filas = ConexionBD.jdbc().query(COLUMNAS + "WHERE ID_Activo = ?", FILA, idActivo);
+        return filas.isEmpty() ? null : filas.get(0);
+    }
+
+    /** buscarPorNumeroSerie(numeroSerie : String) : Activo · HU-02, RF-03. Devuelve null si no existe. */
+    public Activo buscarPorNumeroSerie(String numeroSerie) {
+        List<Activo> filas = ConexionBD.jdbc().query(COLUMNAS + "WHERE Numero_Serie = ?", FILA, numeroSerie);
+        return filas.isEmpty() ? null : filas.get(0);
+    }
+
+    /** buscarPorPlaca(placa : String) : Activo · HU-02, RF-03. Devuelve null si no existe. */
+    public Activo buscarPorPlaca(String placa) {
+        List<Activo> filas = ConexionBD.jdbc().query(COLUMNAS + "WHERE Placa_Inventario = ?", FILA, placa);
+        return filas.isEmpty() ? null : filas.get(0);
     }
 
     // ----- Accesores (D-13). ID_Activo sin setter: {PK, readOnly} -----

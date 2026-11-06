@@ -4,21 +4,74 @@
   NexaActivos - Nexa Servicios S.A.S. · Ingeniería de Software II
   Archivo : src/main/resources/templates/mk01.html
   Capa    : Vista (DDA 3.6 v3_GenC, Tablas 3 y 6)
-  MK      : MK-01 Activos: listado y búsqueda (mockups 2.5)
-  Controlador: ActivoControlador
-  HU      : HU-02
+  MK      : MK-01 Activos: listado y búsqueda (mockups 2.5, Tablas 3 y 4)
+  Controlador: ActivoControlador (buscarPorId, buscarPorNumeroSerie,
+            buscarPorPlaca, listarInventario)
+  HU      : HU-02 · RF-03, RF-56 · CU-02 (no documentado)
+  Navega a: MK-02 («+ Registrar activo»), MK-10 («Editar»), MK-11 («Dar de
+            baja», con Placa_Inventario, Estado, Marca y Modelo). El modo (b)
+            «Seleccionar» (MK-06, CU-15) no entra en el corte.
   La Vista no valida RN ni invoca el Modelo.
   CRF     : CRF-003 · Línea base: LB-1
-  Estado  : esqueleto. El contenido de la pantalla se agrega cuando su HU
-            entre al corte vertical. Propuesta del equipo, pendiente de validar.
+  Estado  : corte vertical. Propuesta del equipo, pendiente de validar.
   Versión 1.0 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
+  Versión 1.1 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-03: búsqueda por ID_Activo, Numero_Serie o Placa_Inventario y ficha de 8 campos
   =====================================================================
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>NexaActivos - MK-01 Activos: listado y búsqueda</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 15px; margin: 24px; }
+    .sesion { background: #1F2A5C; color: #fff; padding: 6px 10px; }
+    .exito { color: #0b6b2e; font-weight: bold; }
+    .error { color: #b00020; font-weight: bold; }
+    .info { color: #333; font-style: italic; }
+    label { display: inline-block; width: 170px; }
+    table { border-collapse: collapse; }
+    th { background: #1F2A5C; color: #fff; }
+    th, td { border: 1px solid #999; padding: 4px 8px; }
+  </style>
 </head>
 <body>
+  <p class="sesion">Usuario en sesión (ID_Usuario):
+    <span th:text="${@sesionActual.idUsuario != null ? @sesionActual.idUsuario : 'sin sesión'}">-</span>
+    · Rol: <span th:text="${@sesionActual.rol != null ? #strings.replace(@sesionActual.rol.name(), '_', ' ') : 'sin sesión'}">-</span>
+    (sesión de prueba, P-62; RNF-02)</p>
+  <h1>MK-01 Activos: listado y búsqueda</h1>
+  <p><a th:href="@{/activos/nuevo}">+ Registrar activo (navega a MK-02)</a></p>
+
+  <h2>Criterio de búsqueda</h2>
+  <form method="get" th:action="@{/activos/buscar/id}">
+    <label for="idActivo">ID_Activo</label> <input id="idActivo" name="idActivo" type="number">
+    <button type="submit">Buscar</button>
+  </form>
+  <form method="get" th:action="@{/activos/buscar/serie}">
+    <label for="numeroSerie">Numero_Serie</label> <input id="numeroSerie" name="numeroSerie" type="text">
+    <button type="submit">Buscar</button>
+  </form>
+  <form method="get" th:action="@{/activos/buscar/placa}">
+    <label for="placa">Placa_Inventario</label> <input id="placa" name="placa" type="text">
+    <button type="submit">Buscar</button>
+  </form>
+  <p th:if="${mensajeError}" class="error" th:text="${mensajeError}"></p>
+
+  <div th:if="${encontrado}">
+    <h2>Activo encontrado</h2>
+    <table>
+      <tr><th>ID_Activo</th><th>Marca</th><th>Modelo</th><th>Numero_Serie</th><th>Placa_Inventario</th><th>Estado</th><th>Ubicacion</th><th>ID_Categoria</th></tr>
+      <tr>
+        <td th:text="${encontrado.idActivo}"></td>
+        <td th:text="${encontrado.marca}"></td>
+        <td th:text="${encontrado.modelo}"></td>
+        <td th:text="${encontrado.numeroSerie}"></td>
+        <td th:text="${encontrado.placaInventario}"></td>
+        <td th:text="${encontrado.estado}"></td>
+        <td th:text="${encontrado.ubicacion}"></td>
+        <td th:text="${encontrado.idCategoria}"></td>
+      </tr>
+    </table>
+  </div>
 </body>
 </html>
