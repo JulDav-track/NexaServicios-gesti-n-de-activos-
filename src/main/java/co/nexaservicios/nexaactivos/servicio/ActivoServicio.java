@@ -60,6 +60,7 @@
  * 1.14    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-58: darDeBaja() rechaza un activo con asignación vigente (RN-A19)
  * 1.15    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-59: textos del aviso M-30 y del desistimiento M-29
  * 1.16    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-04 RF-164: darDeBaja() registra la auditoría (Inactivar; RN-T02a)
+ * 1.17    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-38 RF-166: verificación del permiso del rol en las 7 operaciones
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
@@ -67,6 +68,7 @@ package co.nexaservicios.nexaactivos.servicio;
 import co.nexaservicios.nexaactivos.modelo.catalogos.Categoria;
 import co.nexaservicios.nexaactivos.modelo.enumeraciones.Accion_Auditoria;
 import co.nexaservicios.nexaactivos.modelo.enumeraciones.Estado_Activo;
+import co.nexaservicios.nexaactivos.modelo.enumeraciones.Nombre_Permiso;
 import co.nexaservicios.nexaactivos.modelo.inventario.Activo;
 import co.nexaservicios.nexaactivos.modelo.seguridad_acceso.Auditoria;
 import co.nexaservicios.nexaactivos.soporte.SesionActual;
@@ -116,13 +118,16 @@ public class ActivoServicio {
     private final AsignacionServicio asignacionServicio;
     private final AuditoriaServicio auditoriaServicio;
     private final SesionActual sesion;
+    private final RolPermisoServicio rolPermisoServicio;
 
     public ActivoServicio(CategoriaServicio categoriaServicio, AsignacionServicio asignacionServicio,
-                          AuditoriaServicio auditoriaServicio, SesionActual sesion) {
+                          AuditoriaServicio auditoriaServicio, SesionActual sesion,
+                          RolPermisoServicio rolPermisoServicio) {
         this.categoriaServicio = categoriaServicio;
         this.asignacionServicio = asignacionServicio;
         this.auditoriaServicio = auditoriaServicio;
         this.sesion = sesion;
+        this.rolPermisoServicio = rolPermisoServicio;
     }
 
     /**
@@ -130,6 +135,11 @@ public class ActivoServicio {
      * El Estado nace Disponible: lo fija Activo.crear() (Diccionario v7; RF-01).
      */
     public void crear(Activo a) {
+        // Mensaje 4 · precondición R0 · sin RN; RNF-01 y RF-166 (transversal, origen HU-38). Permiso: Crear (Anexo C)
+        if (sesion.getRol() == null
+                || !rolPermisoServicio.consultarPermisos(sesion.getRol()).contains(Nombre_Permiso.Crear)) {
+            throw new SecurityException(RolPermisoServicio.SIN_PERMISO);
+        }
         // Flujo 3a · restricción del diccionario (NOT NULL); RF-01
         if (a.getMarca() == null || a.getMarca().isBlank()) throw new IllegalArgumentException(M_10);
         if (a.getModelo() == null || a.getModelo().isBlank()) throw new IllegalArgumentException(M_02);
@@ -161,6 +171,11 @@ public class ActivoServicio {
 
     /** buscarPorId(idActivo : int) · HU-02 · CU-02 (no documentado). */
     public Activo buscarPorId(int idActivo) {
+        // Precondición · sin RN; RNF-01 y RF-166 (transversal, origen HU-38). Permiso: Consultar (Anexo C)
+        if (sesion.getRol() == null
+                || !rolPermisoServicio.consultarPermisos(sesion.getRol()).contains(Nombre_Permiso.Consultar)) {
+            throw new SecurityException(RolPermisoServicio.SIN_PERMISO);
+        }
         Activo a = modeloActivo.buscarPorId(idActivo);
         // Activo no encontrado · sin RN; RF-03 (HU-02 CA-4)
         if (a == null) throw new IllegalArgumentException(M_18);
@@ -169,6 +184,11 @@ public class ActivoServicio {
 
     /** buscarPorNumeroSerie(numeroSerie : String) · HU-02 · CU-02 (no documentado). */
     public Activo buscarPorNumeroSerie(String numeroSerie) {
+        // Precondición · sin RN; RNF-01 y RF-166 (transversal, origen HU-38). Permiso: Consultar (Anexo C)
+        if (sesion.getRol() == null
+                || !rolPermisoServicio.consultarPermisos(sesion.getRol()).contains(Nombre_Permiso.Consultar)) {
+            throw new SecurityException(RolPermisoServicio.SIN_PERMISO);
+        }
         Activo a = modeloActivo.buscarPorNumeroSerie(numeroSerie);
         // Activo no encontrado · sin RN; RF-03 (HU-02 CA-4)
         if (a == null) throw new IllegalArgumentException(M_19);
@@ -177,6 +197,11 @@ public class ActivoServicio {
 
     /** buscarPorPlaca(placa : String) · HU-02 · CU-02 (no documentado). */
     public Activo buscarPorPlaca(String placa) {
+        // Precondición · sin RN; RNF-01 y RF-166 (transversal, origen HU-38). Permiso: Consultar (Anexo C)
+        if (sesion.getRol() == null
+                || !rolPermisoServicio.consultarPermisos(sesion.getRol()).contains(Nombre_Permiso.Consultar)) {
+            throw new SecurityException(RolPermisoServicio.SIN_PERMISO);
+        }
         Activo a = modeloActivo.buscarPorPlaca(placa);
         // Activo no encontrado · sin RN; RF-03 (HU-02 CA-4)
         if (a == null) throw new IllegalArgumentException(M_17);
@@ -188,6 +213,11 @@ public class ActivoServicio {
      * muestra M-16 (informativo; sin RN; RF-56).
      */
     public List<Activo> listarInventario() {
+        // Precondición · sin RN; RNF-01 y RF-166 (transversal, origen HU-38). Permiso: Consultar (Anexo C)
+        if (sesion.getRol() == null
+                || !rolPermisoServicio.consultarPermisos(sesion.getRol()).contains(Nombre_Permiso.Consultar)) {
+            throw new SecurityException(RolPermisoServicio.SIN_PERMISO);
+        }
         // Todos los estados, por placa de menor a mayor · sin RN; RF-56
         return modeloActivo.listarInventario();
     }
@@ -197,6 +227,11 @@ public class ActivoServicio {
      * {PK, readOnly}: identifica el activo y no se modifica (M-25 sin camino).
      */
     public void actualizar(Activo a) {
+        // Precondición · sin RN; RNF-01 y RF-166 (transversal, origen HU-38). Permiso: Actualizar (Anexo C)
+        if (sesion.getRol() == null
+                || !rolPermisoServicio.consultarPermisos(sesion.getRol()).contains(Nombre_Permiso.Actualizar)) {
+            throw new SecurityException(RolPermisoServicio.SIN_PERMISO);
+        }
         // Activo inexistente · sin RN; RF-04 (HU-03 CA-7)
         Activo actual = a.getIdActivo() == null ? null : modeloActivo.buscarPorId(a.getIdActivo());
         if (actual == null) throw new IllegalArgumentException(M_21);
@@ -250,6 +285,11 @@ public class ActivoServicio {
      */
     @Transactional
     public void darDeBaja(int idActivo) {
+        // Precondición · sin RN; RNF-01 y RF-166 (transversal, origen HU-38). Permiso: Inactivar (Anexo C)
+        if (sesion.getRol() == null
+                || !rolPermisoServicio.consultarPermisos(sesion.getRol()).contains(Nombre_Permiso.Inactivar)) {
+            throw new SecurityException(RolPermisoServicio.SIN_PERMISO);
+        }
         // Activo inexistente · sin RN; RF-05 (HU-04 CA-5)
         Activo actual = modeloActivo.buscarPorId(idActivo);
         if (actual == null) throw new IllegalArgumentException(M_21);
