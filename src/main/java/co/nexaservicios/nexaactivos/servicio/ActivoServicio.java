@@ -52,6 +52,7 @@
  * 1.6     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-04: actualizar()
  * 1.7     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-51: actualizar() verifica unicidad sin contar al propio activo (RN-A03, RN-A04)
  * 1.8     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-53: actualizar() rechaza categoría inactiva (RN-A09)
+ * 1.9     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-54: actualizar() solo corrige entre Disponible y Dañado (RN-A16b)
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
@@ -87,7 +88,10 @@ public class ActivoServicio {
     public static final String M_19 = "No se encontró ningún activo con ese número de serie.";
     public static final String M_20 = "Activo actualizado correctamente.";
     public static final String M_21 = "El activo no existe.";
+    public static final String M_22 = "El estado Asignado solo se asigna al entregar el equipo.";
+    public static final String M_23 = "El estado Baja solo se asigna dando de baja el activo.";
     public static final String M_24 = "El estado no es válido.";
+    public static final String M_26 = "Un activo asignado no puede cambiar de estado hasta cerrar su asignación.";
 
     private final Activo modeloActivo = new Activo();
     private final CategoriaServicio categoriaServicio;
@@ -197,6 +201,13 @@ public class ActivoServicio {
         if (c == null) throw new IllegalArgumentException(M_09);
         // Categoría inactiva · RN-A09; RF-53 (HU-03 CA-4)
         if (!c.isActivo()) throw new IllegalArgumentException(M_08);
+        if (a.getEstado() != actual.getEstado()) {
+            // Asignado solo al entregar y Baja solo al dar de baja · RN-A16b; RF-54 (HU-03 CA-5)
+            if (a.getEstado() == Estado_Activo.Asignado) throw new IllegalArgumentException(M_22);
+            if (a.getEstado() == Estado_Activo.Baja) throw new IllegalArgumentException(M_23);
+            // La corrección manual solo es entre Disponible y Dañado · RN-A16b; RF-54
+            if (actual.getEstado() == Estado_Activo.Asignado) throw new IllegalArgumentException(M_26);
+        }
         modeloActivo.actualizar(a);
     }
 }
