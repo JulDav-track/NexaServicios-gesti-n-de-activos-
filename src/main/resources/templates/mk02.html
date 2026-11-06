@@ -17,6 +17,7 @@
   Estado  : corte vertical. Propuesta del equipo, pendiente de validar.
   Versión 1.0 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
   Versión 1.1 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-01: formulario de registro y mensajes
+  Versión 1.2 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-56: «Cancelar» navega a MK-01
   =====================================================================
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
@@ -52,6 +53,7 @@
     <p><label for="idCategoria">ID_Categoria</label> <input id="idCategoria" type="number" th:field="*{idCategoria}"></p>
     <p><label>Estado</label> <input type="text" value="Disponible" readonly> (lo asigna el sistema)</p>
     <p><button type="submit">Guardar</button>
+       <a th:href="@{/activos}">Cancelar (navega a MK-01)</a>
     </p>
   </form>
 </body>

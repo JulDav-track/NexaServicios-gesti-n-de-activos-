@@ -16,6 +16,7 @@
   Estado  : corte vertical. Propuesta del equipo, pendiente de validar.
   Versión 1.0 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
   Versión 1.1 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-03: búsqueda por ID_Activo, Numero_Serie o Placa_Inventario y ficha de 8 campos
+  Versión 1.2 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-56: tabla de 6 columnas ordenada por placa y M-16
   =====================================================================
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
@@ -73,5 +74,22 @@
       </tr>
     </table>
   </div>
+
+  <h2>Inventario (ordenado por Placa_Inventario)</h2>
+  <p th:if="${mensajeErrorLista}" class="error" th:text="${mensajeErrorLista}"></p>
+  <p th:if="${activos != null and #lists.isEmpty(activos)}" class="info" th:text="${m16}"></p>
+  <table th:if="${activos != null and !#lists.isEmpty(activos)}">
+    <tr><th>Placa_Inventario</th><th>ID_Activo</th><th>Marca</th><th>Modelo</th><th>Numero_Serie</th><th>Estado</th><th>Acciones</th></tr>
+    <tr th:each="a : ${activos}">
+      <td th:text="${a.placaInventario}"></td>
+      <td th:text="${a.idActivo}"></td>
+      <td th:text="${a.marca}"></td>
+      <td th:text="${a.modelo}"></td>
+      <td th:text="${a.numeroSerie}"></td>
+      <td th:text="${a.estado}"></td>
+      <td>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>

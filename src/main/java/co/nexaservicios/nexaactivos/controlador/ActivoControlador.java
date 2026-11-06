@@ -16,6 +16,7 @@
  *           crear(a)           POST /activos/nuevo           -> MK-02 (mensaje 2 de la Tabla 8)
  *           buscarPorId(), buscarPorNumeroSerie(), buscarPorPlaca()
  *                              GET  /activos/buscar/id|serie|placa -> MK-01
+ *           listarInventario() GET  / y /activos             -> MK-01
  * HU      : HU-01, HU-02, HU-03, HU-04
  * RF      : HU-01: RF-01, RF-02, RF-52; HU-02: RF-03, RF-56; HU-03: RF-04, RF-51, RF-53, RF-54, RF-55, RF-60; HU-04: RF-05, RF-57, RF-58, RF-59, RF-164
  * CU      : CU-01 (Tabla 8 de 3.7, mensajes 2 y respuesta); CU-02 a CU-04 (no documentados)
@@ -29,6 +30,7 @@
  * 1.0     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
  * 1.1     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-01: crear() hacia MK-02
  * 1.2     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-03: búsquedas por clave hacia MK-01
+ * 1.3     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-56: listarInventario() hacia MK-01
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.controlador;
@@ -79,6 +81,12 @@ public class ActivoControlador {
         } catch (IllegalArgumentException | SecurityException e) {
             modelo.addAttribute("mensajeError", e.getMessage());
         }
+        try {
+            modelo.addAttribute("activos", activoServicio.listarInventario());
+            modelo.addAttribute("m16", ActivoServicio.M_16);
+        } catch (IllegalArgumentException | SecurityException e) {
+            modelo.addAttribute("mensajeErrorLista", e.getMessage());
+        }
         return "mk01";
     }
 
@@ -90,6 +98,12 @@ public class ActivoControlador {
         } catch (IllegalArgumentException | SecurityException e) {
             modelo.addAttribute("mensajeError", e.getMessage());
         }
+        try {
+            modelo.addAttribute("activos", activoServicio.listarInventario());
+            modelo.addAttribute("m16", ActivoServicio.M_16);
+        } catch (IllegalArgumentException | SecurityException e) {
+            modelo.addAttribute("mensajeErrorLista", e.getMessage());
+        }
         return "mk01";
     }
 
@@ -100,6 +114,24 @@ public class ActivoControlador {
             modelo.addAttribute("encontrado", activoServicio.buscarPorPlaca(placa));
         } catch (IllegalArgumentException | SecurityException e) {
             modelo.addAttribute("mensajeError", e.getMessage());
+        }
+        try {
+            modelo.addAttribute("activos", activoServicio.listarInventario());
+            modelo.addAttribute("m16", ActivoServicio.M_16);
+        } catch (IllegalArgumentException | SecurityException e) {
+            modelo.addAttribute("mensajeErrorLista", e.getMessage());
+        }
+        return "mk01";
+    }
+
+    /** listarInventario() · HU-02 (MK-01, tabla de 6 columnas ordenada por placa). */
+    @GetMapping({"/", "/activos"})
+    public String listarInventario(Model modelo) {
+        try {
+            modelo.addAttribute("activos", activoServicio.listarInventario());
+            modelo.addAttribute("m16", ActivoServicio.M_16);
+        } catch (IllegalArgumentException | SecurityException e) {
+            modelo.addAttribute("mensajeErrorLista", e.getMessage());
         }
         return "mk01";
     }

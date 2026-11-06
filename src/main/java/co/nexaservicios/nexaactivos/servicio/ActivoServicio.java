@@ -48,12 +48,14 @@
  * 1.2     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-02: crear() rechaza serie o placa registradas (RN-A03, RN-A04)
  * 1.3     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-52: crear() rechaza categoría inactiva (RN-A09)
  * 1.4     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-03: buscarPorId(), buscarPorNumeroSerie(), buscarPorPlaca()
+ * 1.5     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-56: listarInventario()
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
 
 import co.nexaservicios.nexaactivos.modelo.catalogos.Categoria;
 import co.nexaservicios.nexaactivos.modelo.inventario.Activo;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -75,6 +77,7 @@ public class ActivoServicio {
     public static final String M_13 = "La placa de inventario no puede superar 11 caracteres.";
     public static final String M_14 = "La placa de inventario ya está registrada.";
     public static final String M_15 = "La ubicación no puede superar 100 caracteres.";
+    public static final String M_16 = "No hay activos registrados.";
     public static final String M_17 = "No se encontró ningún activo con esa placa de inventario.";
     public static final String M_18 = "No se encontró ningún activo con ese identificador.";
     public static final String M_19 = "No se encontró ningún activo con ese número de serie.";
@@ -142,5 +145,14 @@ public class ActivoServicio {
         // Activo no encontrado · sin RN; RF-03 (HU-02 CA-4)
         if (a == null) throw new IllegalArgumentException(M_17);
         return a;
+    }
+
+    /**
+     * listarInventario() · HU-02 · CU-02 (no documentado). Lista vacía: la Vista
+     * muestra M-16 (informativo; sin RN; RF-56).
+     */
+    public List<Activo> listarInventario() {
+        // Todos los estados, por placa de menor a mayor · sin RN; RF-56
+        return modeloActivo.listarInventario();
     }
 }
