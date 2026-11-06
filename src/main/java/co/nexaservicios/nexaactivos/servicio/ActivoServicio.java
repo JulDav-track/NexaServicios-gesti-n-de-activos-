@@ -54,6 +54,7 @@
  * 1.8     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-53: actualizar() rechaza categoría inactiva (RN-A09)
  * 1.9     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-54: actualizar() solo corrige entre Disponible y Dañado (RN-A16b)
  * 1.10    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-55: actualizar() rechaza un activo en Baja (RN-A18)
+ * 1.11    | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-60: actualizar() rechaza el cambio de estado con asignación vigente (RN-A16a)
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
@@ -97,9 +98,11 @@ public class ActivoServicio {
 
     private final Activo modeloActivo = new Activo();
     private final CategoriaServicio categoriaServicio;
+    private final AsignacionServicio asignacionServicio;
 
-    public ActivoServicio(CategoriaServicio categoriaServicio) {
+    public ActivoServicio(CategoriaServicio categoriaServicio, AsignacionServicio asignacionServicio) {
         this.categoriaServicio = categoriaServicio;
+        this.asignacionServicio = asignacionServicio;
     }
 
     /**
@@ -206,6 +209,10 @@ public class ActivoServicio {
         // Categoría inactiva · RN-A09; RF-53 (HU-03 CA-4)
         if (!c.isActivo()) throw new IllegalArgumentException(M_08);
         if (a.getEstado() != actual.getEstado()) {
+            // Cambio de estado con asignación vigente · RN-A16a; RF-60 (HU-03 CA-5)
+            if (asignacionServicio.buscarVigentePorActivo(actual.getIdActivo()) != null) {
+                throw new IllegalArgumentException(M_26);
+            }
             // Asignado solo al entregar y Baja solo al dar de baja · RN-A16b; RF-54 (HU-03 CA-5)
             if (a.getEstado() == Estado_Activo.Asignado) throw new IllegalArgumentException(M_22);
             if (a.getEstado() == Estado_Activo.Baja) throw new IllegalArgumentException(M_23);
