@@ -50,6 +50,7 @@
  * 1.4     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-03: buscarPorId(), buscarPorNumeroSerie(), buscarPorPlaca()
  * 1.5     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-02 RF-56: listarInventario()
  * 1.6     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-04: actualizar()
+ * 1.7     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-03 RF-51: actualizar() verifica unicidad sin contar al propio activo (RN-A03, RN-A04)
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
@@ -185,6 +186,11 @@ public class ActivoServicio {
         if (a.getEstado() == null) throw new IllegalArgumentException(M_24);
         // Ubicacion opcional · restricción del diccionario: vacía se guarda como NULL; RF-04
         if (a.getUbicacion() != null && a.getUbicacion().isBlank()) a.setUbicacion(null);
+        // Unicidad sin contar al propio activo · RN-A03, RN-A04; RF-51 (HU-03 CA-3)
+        if (!a.getNumeroSerie().equalsIgnoreCase(actual.getNumeroSerie())
+                && modeloActivo.existeNumeroSerie(a.getNumeroSerie())) throw new IllegalArgumentException(M_06);
+        if (!a.getPlacaInventario().equalsIgnoreCase(actual.getPlacaInventario())
+                && modeloActivo.existePlaca(a.getPlacaInventario())) throw new IllegalArgumentException(M_14);
         Categoria c = categoriaServicio.buscarPorId(a.getIdCategoria());
         // Categoría inexistente · restricción del diccionario (FK); RF-04
         if (c == null) throw new IllegalArgumentException(M_09);
