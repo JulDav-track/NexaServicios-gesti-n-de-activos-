@@ -4,21 +4,55 @@
   NexaActivos - Nexa Servicios S.A.S. · Ingeniería de Software II
   Archivo : src/main/resources/templates/mk02.html
   Capa    : Vista (DDA 3.6 v3_GenC, Tablas 3 y 6)
-  MK      : MK-02 Registrar activo (mockups 2.5)
-  Controlador: ActivoControlador
-  HU      : HU-01
-  La Vista no valida RN ni invoca el Modelo.
+  MK      : MK-02 Registrar activo (mockups 2.5, Tablas 5 y 6)
+  Controlador: ActivoControlador (crear)
+  HU      : HU-01 · RF-01, RF-02, RF-52 · CU-01 (mensaje 1 de la Tabla 8 de 3.7)
+  Campos  : Marca, Modelo, Numero_Serie, Placa_Inventario, Ubicacion (opcional)
+            e ID_Categoria (numérico, sin ayuda de búsqueda: propuesta).
+            Estado: solo lectura «Disponible» (lo asigna el sistema).
+            ID_Activo no se muestra (automático).
+  La Vista no valida RN ni invoca el Modelo: sin required ni maxlength, para
+  que las guardas del Servicio respondan con su mensaje M-xx.
   CRF     : CRF-003 · Línea base: LB-1
-  Estado  : esqueleto. El contenido de la pantalla se agrega cuando su HU
-            entre al corte vertical. Propuesta del equipo, pendiente de validar.
+  Estado  : corte vertical. Propuesta del equipo, pendiente de validar.
   Versión 1.0 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
+  Versión 1.1 | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-01: formulario de registro y mensajes
   =====================================================================
 -->
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>NexaActivos - MK-02 Registrar activo</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 15px; margin: 24px; }
+    .sesion { background: #1F2A5C; color: #fff; padding: 6px 10px; }
+    .exito { color: #0b6b2e; font-weight: bold; }
+    .error { color: #b00020; font-weight: bold; }
+    .info { color: #333; font-style: italic; }
+    label { display: inline-block; width: 170px; }
+    table { border-collapse: collapse; }
+    th { background: #1F2A5C; color: #fff; }
+    th, td { border: 1px solid #999; padding: 4px 8px; }
+  </style>
 </head>
 <body>
+  <p class="sesion">Usuario en sesión (ID_Usuario):
+    <span th:text="${@sesionActual.idUsuario != null ? @sesionActual.idUsuario : 'sin sesión'}">-</span>
+    · Rol: <span th:text="${@sesionActual.rol != null ? #strings.replace(@sesionActual.rol.name(), '_', ' ') : 'sin sesión'}">-</span>
+    (sesión de prueba, P-62; RNF-02)</p>
+  <h1>MK-02 Registrar activo</h1>
+  <p th:if="${mensajeExito}" class="exito" th:text="${mensajeExito}"></p>
+  <p th:if="${mensajeError}" class="error" th:text="${mensajeError}"></p>
+  <form method="post" th:action="@{/activos/nuevo}" th:object="${activo}">
+    <p><label for="marca">Marca</label> <input id="marca" type="text" th:field="*{marca}"></p>
+    <p><label for="modelo">Modelo</label> <input id="modelo" type="text" th:field="*{modelo}"></p>
+    <p><label for="numeroSerie">Numero_Serie</label> <input id="numeroSerie" type="text" th:field="*{numeroSerie}"></p>
+    <p><label for="placaInventario">Placa_Inventario</label> <input id="placaInventario" type="text" th:field="*{placaInventario}"></p>
+    <p><label for="ubicacion">Ubicacion (opcional)</label> <input id="ubicacion" type="text" th:field="*{ubicacion}"></p>
+    <p><label for="idCategoria">ID_Categoria</label> <input id="idCategoria" type="number" th:field="*{idCategoria}"></p>
+    <p><label>Estado</label> <input type="text" value="Disponible" readonly> (lo asigna el sistema)</p>
+    <p><button type="submit">Guardar</button>
+    </p>
+  </form>
 </body>
 </html>

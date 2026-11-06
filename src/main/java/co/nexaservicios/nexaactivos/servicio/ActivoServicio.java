@@ -4,24 +4,103 @@
  * Uniremington 2026-02 · Docente: Gloria Amparo Lora Patiño
  * Archivo : src/main/java/co/nexaservicios/nexaactivos/servicio/ActivoServicio.java
  * Capa    : Servicio
- * Servicio de la clase Activo (Tabla 4, fila 1): expone sus 7 operaciones
- *           públicas, valida las RN y el permiso del rol (RF-166). Sin repositorio.
+ * Servicio de la clase Activo (Tabla 4, fila 1). Expone las 7 operaciones
+ *           públicas de la Tabla 5 del DDA, con los mismos nombres y
+ *           parámetros: crear(a : Activo), buscarPorId(idActivo : int),
+ *           buscarPorNumeroSerie(numeroSerie : String), buscarPorPlaca(placa :
+ *           String), listarInventario(), actualizar(a : Activo),
+ *           darDeBaja(idActivo : int). Invoca los INTERNO de su clase
+ *           (Activo.existeNumeroSerie(), Activo.existePlaca()). Aquí, y solo
+ *           aquí, viven las guardas: cada una cita su RN con ficha, «sin RN»
+ *           con su RF o «restricción del diccionario».
+ * Orden   : crear() sigue los mensajes 3 a 8 de la Tabla 8 de 3.7 (CU-01).
+ *           Las demás operaciones no tienen CU documentado (CU-02 a CU-04):
+ *           su orden de verificación es propuesta del equipo (HAL-28).
  * HU      : HU-01, HU-02, HU-03, HU-04
  * RF      : HU-01: RF-01, RF-02, RF-52; HU-02: RF-03, RF-56; HU-03: RF-04, RF-51, RF-53, RF-54, RF-55, RF-60; HU-04: RF-05, RF-57, RF-58, RF-59, RF-164
- * CU      : CU-01, CU-02, CU-03, CU-04
+ *           RF-166 es transversal (origen HU-38): verificación del permiso.
+ * RN      : RN-A03, RN-A04 (unicidad de serie y placa), RN-A09 (categoría
+ *           activa), RN-A16a (sin corrección de estado con asignación
+ *           vigente), RN-A16b (Asignado solo al entregar y Baja solo al dar de
+ *           baja), RN-A18 (activo en Baja), RN-A19 (baja con asignación
+ *           vigente), RN-T02a (la baja queda registrada). Todas con ficha en
+ *           el documento 2.2 de RN; cada guarda indica su RF.
+ * CU      : CU-01 (Tabla 8 y Figura 6 de 3.7; «include» CU-48 y CU-49);
+ *           CU-02, CU-03 y CU-04 (no documentados)
  * MK      : MK-01, MK-02, MK-10, MK-11
- * RN      : se citan junto a la guarda que valida cada una, en el Servicio
- *           (corte vertical, sección 4.3); este archivo aún no tiene guardas.
- * CRF     : CRF-003 · Línea base: LB-1
- * Fuentes : DDA 3.6 v3_GenC (Tablas 2, 4 y 6); matriz 3.9 v2 (Tabla 1).
- * Estado  : esqueleto sin atributos ni métodos. Las operaciones de la Tabla 5 del DDA se agregan en la entrega del corte vertical.
- *           Propuesta del equipo, pendiente de validar.
+ * Mensajes: textos idénticos al catálogo E del Consolidado de 46 HU (M-01 a
+ *           M-273), en las constantes M_xx. El rechazo por rol usa
+ *           RolPermisoServicio.SIN_PERMISO (propuesta, sin número).
+ * Rechazos: IllegalArgumentException con el texto M-xx (datos o RN) y
+ *           SecurityException para el rechazo por rol (D-15).
+ * Dependencias: CategoriaServicio (CU-48), AsignacionServicio (asignación
+ *           vigente), AuditoriaServicio (registrar, INTERNO), RolPermisoServicio
+ *           (RF-166) y SesionActual (usuario y rol en sesión, D-11).
+ * CRF     : CRF-003 · Línea base: LB-1. Sin métodos de CRF-004 ni MOD-55.
+ * Fuentes : DDA 3.6 v3_GenC (Tablas 4 y 5); 3.7 v3 (Tablas 8 y 10); matriz
+ *           3.9 v2 (filas HU-01 a HU-04); C.1 y catálogo E del Consolidado;
+ *           fichas de RN (2.2); RF (2.2.6); Anexo C (permiso por operación).
+ * Estado  : corte vertical. Propuesta del equipo, pendiente de validar.
  *
  * Versión | Fecha      | Autores | Cambio
  * 1.0     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
+ * 1.1     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-01: crear() con obligatorios, longitudes y categoría existente
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
 
+import co.nexaservicios.nexaactivos.modelo.catalogos.Categoria;
+import co.nexaservicios.nexaactivos.modelo.inventario.Activo;
+import org.springframework.stereotype.Service;
+
+@Service
 public class ActivoServicio {
+
+    // ----- Mensajes del catálogo E (M-01 a M-273), texto idéntico -----
+    public static final String M_01 = "Activo registrado correctamente.";
+    public static final String M_02 = "El modelo es obligatorio.";
+    public static final String M_03 = "El modelo no puede superar 50 caracteres.";
+    public static final String M_04 = "El número de serie es obligatorio.";
+    public static final String M_05 = "El número de serie no puede superar 20 caracteres.";
+    public static final String M_07 = "La categoría es obligatoria.";
+    public static final String M_09 = "La categoría seleccionada no existe.";
+    public static final String M_10 = "La marca es obligatoria.";
+    public static final String M_11 = "La marca no puede superar 50 caracteres.";
+    public static final String M_12 = "La placa de inventario es obligatoria.";
+    public static final String M_13 = "La placa de inventario no puede superar 11 caracteres.";
+    public static final String M_15 = "La ubicación no puede superar 100 caracteres.";
+
+    private final Activo modeloActivo = new Activo();
+    private final CategoriaServicio categoriaServicio;
+
+    public ActivoServicio(CategoriaServicio categoriaServicio) {
+        this.categoriaServicio = categoriaServicio;
+    }
+
+    /**
+     * crear(a : Activo) · HU-01 · CU-01 (Tabla 8 de 3.7, mensaje 3).
+     * El Estado nace Disponible: lo fija Activo.crear() (Diccionario v7; RF-01).
+     */
+    public void crear(Activo a) {
+        // Flujo 3a · restricción del diccionario (NOT NULL); RF-01
+        if (a.getMarca() == null || a.getMarca().isBlank()) throw new IllegalArgumentException(M_10);
+        if (a.getModelo() == null || a.getModelo().isBlank()) throw new IllegalArgumentException(M_02);
+        if (a.getNumeroSerie() == null || a.getNumeroSerie().isBlank()) throw new IllegalArgumentException(M_04);
+        if (a.getPlacaInventario() == null || a.getPlacaInventario().isBlank()) throw new IllegalArgumentException(M_12);
+        if (a.getIdCategoria() == null) throw new IllegalArgumentException(M_07);
+        // Flujo 4a · restricción del diccionario (longitud VARCHAR); RF-01
+        if (a.getMarca().length() > 50) throw new IllegalArgumentException(M_11);
+        if (a.getModelo().length() > 50) throw new IllegalArgumentException(M_03);
+        if (a.getNumeroSerie().length() > 20) throw new IllegalArgumentException(M_05);
+        if (a.getPlacaInventario().length() > 11) throw new IllegalArgumentException(M_13);
+        if (a.getUbicacion() != null && a.getUbicacion().length() > 100) throw new IllegalArgumentException(M_15);
+        // Flujo 2a · restricción del diccionario (Ubicacion opcional): vacía se guarda como NULL; RF-01
+        if (a.getUbicacion() != null && a.getUbicacion().isBlank()) a.setUbicacion(null);
+        // Mensaje 7 · «include» CU-48 · flujo 6a
+        Categoria c = categoriaServicio.buscarPorId(a.getIdCategoria());
+        // Categoría inexistente · restricción del diccionario (FK); RF-01
+        if (c == null) throw new IllegalArgumentException(M_09);
+        // Mensaje 8 · paso 7 · RF-01
+        modeloActivo.crear(a);
+    }
 }
