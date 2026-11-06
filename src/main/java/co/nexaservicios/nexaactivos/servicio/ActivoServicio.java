@@ -45,6 +45,7 @@
  * Versión | Fecha      | Autores | Cambio
  * 1.0     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
  * 1.1     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-01: crear() con obligatorios, longitudes y categoría existente
+ * 1.2     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-02: crear() rechaza serie o placa registradas (RN-A03, RN-A04)
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.servicio;
@@ -62,12 +63,14 @@ public class ActivoServicio {
     public static final String M_03 = "El modelo no puede superar 50 caracteres.";
     public static final String M_04 = "El número de serie es obligatorio.";
     public static final String M_05 = "El número de serie no puede superar 20 caracteres.";
+    public static final String M_06 = "El número de serie ya está registrado.";
     public static final String M_07 = "La categoría es obligatoria.";
     public static final String M_09 = "La categoría seleccionada no existe.";
     public static final String M_10 = "La marca es obligatoria.";
     public static final String M_11 = "La marca no puede superar 50 caracteres.";
     public static final String M_12 = "La placa de inventario es obligatoria.";
     public static final String M_13 = "La placa de inventario no puede superar 11 caracteres.";
+    public static final String M_14 = "La placa de inventario ya está registrada.";
     public static final String M_15 = "La ubicación no puede superar 100 caracteres.";
 
     private final Activo modeloActivo = new Activo();
@@ -96,6 +99,11 @@ public class ActivoServicio {
         if (a.getUbicacion() != null && a.getUbicacion().length() > 100) throw new IllegalArgumentException(M_15);
         // Flujo 2a · restricción del diccionario (Ubicacion opcional): vacía se guarda como NULL; RF-01
         if (a.getUbicacion() != null && a.getUbicacion().isBlank()) a.setUbicacion(null);
+        // Mensajes 5 y 6 · «include» CU-49 · flujo 5a · RN-A03, RN-A04; RF-02
+        boolean serieRegistrada = modeloActivo.existeNumeroSerie(a.getNumeroSerie());
+        boolean placaRegistrada = modeloActivo.existePlaca(a.getPlacaInventario());
+        if (serieRegistrada) throw new IllegalArgumentException(M_06);
+        if (placaRegistrada) throw new IllegalArgumentException(M_14);
         // Mensaje 7 · «include» CU-48 · flujo 6a
         Categoria c = categoriaServicio.buscarPorId(a.getIdCategoria());
         // Categoría inexistente · restricción del diccionario (FK); RF-01

@@ -7,6 +7,7 @@
  * Clase   : Activo (paquete Inventario del diagrama v6 con CRF-003; Tabla 4, fila 1)
  * Métodos : 7 públicos y 2 INTERNO en el diagrama. Implementados en el corte:
  *           crear()
+ *           existeNumeroSerie() «INTERNO», existePlaca() «INTERNO»
  * HU      : HU-01, HU-02, HU-03, HU-04
  * RF      : HU-01: RF-01, RF-02, RF-52; HU-02: RF-03, RF-56; HU-03: RF-04, RF-51, RF-53, RF-54, RF-55, RF-60; HU-04: RF-05, RF-57, RF-58, RF-59, RF-164
  * CU      : CU-01 (Tabla 8 y Figura 6 de 3.7; incluye CU-48 y CU-49); CU-02, CU-03 y CU-04 (no documentados)
@@ -29,6 +30,7 @@
  * Versión | Fecha      | Autores | Cambio
  * 1.0     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | Esqueleto inicial (entrega 4.2)
  * 1.1     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-01: atributos del Diccionario v7 y crear()
+ * 1.2     | 06/11/2026 | Julián David Valencia Gamboa; Eliú Marimón Arrieta | HU-01 RF-02: existeNumeroSerie() y existePlaca() «INTERNO»
  * =====================================================================
  */
 package co.nexaservicios.nexaactivos.modelo.inventario;
@@ -63,6 +65,20 @@ public class Activo {
             + "VALUES (?, ?, ?, ?, ?, ?, ?)",
             a.getMarca(), a.getModelo(), Estado_Activo.Disponible.name(), a.getNumeroSerie(),
             a.getPlacaInventario(), a.getUbicacion(), a.getIdCategoria());
+    }
+
+    /** existeNumeroSerie(numeroSerie : String) : boolean «INTERNO» · lo invoca solo ActivoServicio (CU-49). */
+    public boolean existeNumeroSerie(String numeroSerie) {
+        Integer n = ConexionBD.jdbc().queryForObject(
+            "SELECT COUNT(*) FROM Activo WHERE Numero_Serie = ?", Integer.class, numeroSerie);
+        return n != null && n > 0;
+    }
+
+    /** existePlaca(placa : String) : boolean «INTERNO» · lo invoca solo ActivoServicio (CU-49). */
+    public boolean existePlaca(String placa) {
+        Integer n = ConexionBD.jdbc().queryForObject(
+            "SELECT COUNT(*) FROM Activo WHERE Placa_Inventario = ?", Integer.class, placa);
+        return n != null && n > 0;
     }
 
     // ----- Accesores (D-13). ID_Activo sin setter: {PK, readOnly} -----
