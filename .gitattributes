@@ -1,0 +1,4 @@
+# NexaActivos · .gitattributes (sección 4.2). Propuesta del equipo.
+# Los scripts SQL aprobados se guardan byte a byte: Git no convierte sus
+# finales de línea (ni LF a CRLF ni CRLF a LF) en ningún sistema operativo.
+*.sql -text

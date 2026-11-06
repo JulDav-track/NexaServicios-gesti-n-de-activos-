@@ -1,0 +1,39 @@
+# =====================================================================
+# NexaActivos · .gitignore (sección 4.2; IS2 paso 14: fuera compilados y
+# credenciales). Propuesta del equipo, pendiente de validar.
+# CRF-003 · Línea base: LB-1
+# =====================================================================
+
+# Compilados y empaquetados (Maven / Gradle)
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+
+# Entornos de desarrollo
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+
+# Registros
+*.log
+
+# Credenciales y configuración local: la clave de la base de datos va por
+# la variable de entorno NEXA_DB_PASSWORD, nunca en un archivo versionado
+.env
+application-local.properties
+
+# Archivos del sistema operativo
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Salidas de los comandos de verificación (se adjuntan al Word, no se versionan)
+salida_*.txt
+verificacion_*.txt
